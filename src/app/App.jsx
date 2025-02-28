@@ -22,64 +22,36 @@ import AdminJobPage from '../pages/AdminPage/AdminJobPage/AdminJobPage';
 
 import LoginPage from '../pages/LoginPage/LoginPage';
 import SignPage from '../pages/SignPage/SignPage'
-
 function App() {
-
   const location = useLocation();
 
   useEffect(() => {
-    document.querySelector('html').style.scrollBehavior = 'auto'
-    window.scroll({ top: 0 })
-    document.querySelector('html').style.scrollBehavior = ''
+    document.querySelector('html').style.scrollBehavior = 'auto';
+    window.scroll({ top: 0 });
+    document.querySelector('html').style.scrollBehavior = '';
   }, [location.pathname]);
 
   return (
-    <>
-
-      <Routes>
-        <Route exact path="/*" element={<LoginPage/>} />
-        <Route exact path="/signup" element={<LoginPage />} />
-        <Route exact path="/sign" element={<SignPage />} />
-      </Routes>
-
-
-
-      {/* <Routes>
-      <Route exact path="/*" element={<EmployeeDashboard />} />
-        <Route exact path="/employee/dashboard" element={<EmployeeDashboard />} />
-        <Route exact path="/employee/dashboard/about" element={<EmployeeAbout />} />
-        <Route exact path="/employee/dashboard/course" element={<EmployeeCourse />} />
-        <Route exact path="/employee/dashboard/job" element={<EmployeeJobPage />} />
-      </Routes> */}
-
-
-      {/* <Routes>
-      <Route exact path="/*" element={<EmployeesDashboard />} />
-        <Route exact path="/employees/dashboard" element={<EmployeesDashboard />} />
-        <Route exact path="/employees/dashboard/about" element={<EmployeesAbout />} />
-        <Route exact path="/employees/dashboard/course" element={<EmployeesCourse />} />
-        <Route exact path="/employees/dashboard/job" element={<EmployeesJobPage />} />
-      </Routes> */}
-
-
-
-      {/* <Routes>
-        <Route exact path="/*" element={<TrainersDashboard />} />
-        <Route exact path="/trainers/dashboard" element={<TrainersDashboard />} />
-        <Route exact path="/trainers/dashboard/about" element={<TrainersAbout />} />
-        <Route exact path="/trainers/dashboard/course" element={<TrainersCourse />} />
-        <Route exact path="/trainers/dashboard/job" element={<TrainersJobPage />} />
-      </Routes> */}
-
-
-      {/* <Routes>
-        <Route exact path="/*" element={<AdminUserPage />} />
-        <Route exact path="/admin/dashboard" element={<AdminUserPage />} />
-        <Route exact path="/admin/dashboard/job" element={<AdminJobPage />} />
-        <Route exact path="/admin/dashboard/course" element={<AdminCoursePage />} />
-      </Routes> */}
-
-    </>
+    <Routes>
+      <Route path="/*" element={<LoginPageTest />} />
+      <Route path="/signup" element={<LoginPage />} />
+      <Route path="/sign" element={<SignPage />} />
+      <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+      <Route path="/employee/dashboard/about" element={<EmployeeAbout />} />
+      <Route path="/employee/dashboard/course" element={<EmployeeCourse />} />
+      <Route path="/employee/dashboard/job" element={<EmployeeJobPage />} />
+      <Route path="/employees/dashboard" element={<EmployeesDashboard />} />
+      <Route path="/employees/dashboard/about" element={<EmployeesAbout />} />
+      <Route path="/employees/dashboard/course" element={<EmployeesCourse />} />
+      <Route path="/employees/dashboard/job" element={<EmployeesJobPage />} />
+      <Route path="/trainers/dashboard" element={<TrainersDashboard />} />
+      <Route path="/trainers/dashboard/about" element={<TrainersAbout />} />
+      <Route path="/trainers/dashboard/course" element={<TrainersCourse />} />
+      <Route path="/trainers/dashboard/job" element={<TrainersJobPage />} />
+      <Route path="/admin/dashboard" element={<AdminUserPage />} />
+      <Route path="/admin/dashboard/job" element={<AdminJobPage />} />
+      <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />
+    </Routes>
   );
 }
 
