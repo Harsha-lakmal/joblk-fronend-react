@@ -33,7 +33,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/*" element={<LoginPageTest />} />
+      <Route path="/*" element={<LoginPage />} />
       <Route path="/signup" element={<LoginPage />} />
       <Route path="/sign" element={<SignPage />} />
       <Route path="/employee/dashboard" element={<EmployeeDashboard />} />

@@ -151,7 +151,7 @@ function EmployeesSidebar({
                     <React.Fragment>
                       <a
                         href="#0"
-                        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname === "/employee/dashboard/about" || pathname.includes("EmployeeAbout") ? "" : "hover:text-gray-900 dark:hover:text-white"
+                        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname === "/employees/dashboard/about" || pathname.includes("EmployeeAbout") ? "" : "hover:text-gray-900 dark:hover:text-white"
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -167,7 +167,7 @@ function EmployeesSidebar({
                             <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="/employee/dashboard/about"
+                              to="/employees/dashboard/about"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " + (isActive ? "text-violet-500" : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                               }
@@ -197,7 +197,7 @@ function EmployeesSidebar({
                     <React.Fragment>
                       <a
                         href="#0"
-                        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname === "/employee/dashboard/course" || pathname.includes("EmployeeCourse") ? "" : "hover:text-gray-900 dark:hover:text-white"
+                        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname === "/employees/dashboard/course" || pathname.includes("EmployeeCourse") ? "" : "hover:text-gray-900 dark:hover:text-white"
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -244,7 +244,7 @@ function EmployeesSidebar({
                     <React.Fragment>
                       <a
                         href="#0"
-                        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname === "/employee/dashboard/job" || pathname.includes("EmployeeJobPage") ? "" : "hover:text-gray-900 dark:hover:text-white"
+                        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname === "/employees/dashboard/job" || pathname.includes("EmployeeJobPage") ? "" : "hover:text-gray-900 dark:hover:text-white"
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -260,7 +260,7 @@ function EmployeesSidebar({
                             <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="/employee/dashboard/job"
+                              to="/employees/dashboard/job"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " + (isActive ? "text-violet-500" : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                               }
