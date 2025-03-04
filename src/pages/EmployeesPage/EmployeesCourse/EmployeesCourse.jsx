@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 
 import Header from '../../../partials/Header';
-import DashboardCard13 from '../../../partials/dashboard/DashboardCard13';
+import JobCard from '../../../comon/JobCard/JobCard';
 import Banner from '../../../comon/Banner/Banner';
 import EmployeesSidebar from '../../../partials/EmployeesSidebar';
+import AddJobs from '../../../comon/AddJobs/AddJobs';
+import AddCourse from '../../../comon/AddCourse/AddCourse';
+import AddUser from '../../../comon/AddUser/AddUser';
+import CourseCard from '../../../comon/CourseCard/CourseCard';
 
 function EmployeesCourse() {
 
@@ -37,6 +41,7 @@ function EmployeesCourse() {
                 {/* Filter button */}
                 {/* Datepicker built with React Day Picker */}
                 {/* Add view button */}
+
                             
               </div>
 
@@ -45,11 +50,14 @@ function EmployeesCourse() {
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
 
-              <DashboardCard13 />
-              
+            <JobCard/>
+        
+
+
             </div>
 
           </div>
+          
         </main>
 
         <Banner />

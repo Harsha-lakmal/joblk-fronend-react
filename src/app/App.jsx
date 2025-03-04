@@ -34,7 +34,7 @@ function App() {
   return (
     <Routes>
       <Route path="/*" element={<LoginPage />} />
-      <Route path="/signup" element={<LoginPage />} />
+      <Route path="/signup" element={<LoginPage />} /> 
       <Route path="/sign" element={<SignPage />} />
       <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
       <Route path="/employee/dashboard/about" element={<EmployeeAbout />} />
@@ -50,7 +50,7 @@ function App() {
       <Route path="/trainers/dashboard/job" element={<TrainersJobPage />} />
       <Route path="/admin/dashboard" element={<AdminUserPage />} />
       <Route path="/admin/dashboard/job" element={<AdminJobPage />} />
-      <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />
+      <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />    
     </Routes>
   );
 }

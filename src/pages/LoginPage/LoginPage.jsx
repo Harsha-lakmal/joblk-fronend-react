@@ -1,27 +1,8 @@
 import React, { useState } from 'react';
-import { Checkbox, TextField, Button, Typography, Box, FormControlLabel, Select, MenuItem, InputLabel, FormControl, OutlinedInput, ThemeProvider, CssBaseline } from '@mui/material';
+import { Checkbox, TextField, Button, Typography, Box, FormControlLabel, ThemeProvider, CssBaseline } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-
-import TrainersAbout from '../TrainersPage/TrainersAbout/TrainersAbout';
-import TrainersCourse from '../TrainersPage/TrainersCourse/TrainersCourse';
-import TrainersDashboard from '../TrainersPage/TrainersDashboard/TrainersDashboard';
-import TrainersJobPage from '../TrainersPage/TrainersJobPage/TrainersJobPage';
-
-import EmployeeAbout from '../EmployeePage/EmployeeAbout/EmployeeAbout';
-import EmployeeCourse from '../EmployeePage/EmployeeCourse/EmployeeCourse';
-import EmployeeDashboard from '../EmployeePage/EmployeeDashboard/EmployeeDashboard';
-import EmployeeJobPage from '../EmployeePage/EmployeeJobPage/EmployeeJobPage';
-
-import EmployeesAbout from '../EmployeesPage/EmployeesAbout/EmployeesAbout';
-import EmployeesCourse from '../EmployeesPage/EmployeesCourse/EmployeesCourse';
-import EmployeesDashboard from '../EmployeesPage/EmployeesDashboard/EmployeesDashboard';
-import EmployeesJobPage from '../EmployeesPage/EmployeesJobPage/EmployeesJobPage';
-
-import AdminCoursePage from '../AdminPage/AdminCoursePage/AdminCoursePage';
-import AdminJobPage from '../AdminPage/AdminJobPage/AdminJobPage';
-import AdminUserPage from '../AdminPage/AdminUserPage/AdminUserPage';
 
 const darkTheme = createTheme({
     palette: {
@@ -31,140 +12,213 @@ const darkTheme = createTheme({
     },
 });
 
-function succes() {
+function successMessage() {
     Swal.fire({
         position: "top-end",
         icon: "success",
-        title: "Your Login Successful",
+        title: "Login Successful",
         showConfirmButton: false,
         timer: 2000,
     });
 }
 
-function error() {
+function errorMessage(msg) {
     Swal.fire({
         position: "top-end",
         icon: "error",
-        title: "Your Login Unsuccessful",
+        title: msg || "Login Unsuccessful",
         showConfirmButton: false,
         timer: 2000,
     });
 }
-
-const roles = ['Employee', 'Trainer', 'Employees', 'Admin'];
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('');
     const [tandc, setTandc] = useState(false);
+    const [username, setUserName] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = () => {
-        // Here you should perform the validation for the login
-        if (!email || !password) {
-            error();
+    const handleLogin = async () => {
+        if (!email || !password || !username) {
+            errorMessage("Please fill all fields.");
             return;
         }
 
-        // Call the success alert
-        succes();
+        handleGetUserData();
+        const data = { username, password };
+        
 
-        // Based on role, navigate to the relevant route
-        if (role === 'Admin') {
-            navigate('/admin/dashboard');
-        } else if (role === 'Employee') {
-            navigate('/employees/dashboard');
-        } else if (role === 'Employees') {
-            navigate('/employees/dashboard');
-        } else if (role === 'Trainer') {
-            navigate('/trainers/dashboard');
+        try {
+            const response = await fetch("http://localhost:8081/api/v1/user/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                errorMessage(errorText || "Login failed. Please check your credentials.");
+                return;
+            }
+
+            const result = await response.text();
+            if (result) {
+                const token = result.trim();
+                console.log(token);
+
+                if (token) {
+                    localStorage.setItem("token", token);
+                    successMessage();
+
+                    
+                    
+                    // navigate('/admin/dashboard');
+                } else {
+                    errorMessage("Invalid token received.");
+                }
+            } else {
+                errorMessage("Invalid response format.");
+            }
+        } catch (error) {
+            errorMessage("Server error. Please try again later.");
+            console.error("Error:", error);
         }
     };
 
+
+    const handleGetUserData = async () => {
+        try {
+            // Get the token from localStorage (assuming it's stored there)
+            const token = localStorage.getItem("token");  
+            if (!token) {
+                errorMessage("No token found. Please log in.");
+                return;
+            }
+    
+            // Use the token for authorization
+            const response = await fetch("http://localhost:8081/api/v1/user/getUser/"+ username, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`, 
+                },
+            });
+    
+            // Check for a valid response
+            if (!response.ok) {
+                const errorText = await response.text(); // Get the error message from the response
+                errorMessage(errorText || "Not User! Try again.");
+                return;
+            }
+    
+            const result = await response.text();
+            if (result) {
+                const data = result.trim();
+                console.log(data); 
+    
+                if (data) {
+                    localStorage.setItem("data", data); // Store the data in localStorage
+                    successMessage(); // Show success message
+    
+                    // Navigate or take appropriate action after successful response
+                    // For example, you can navigate to a dashboard page
+                    // navigate('/admin/dashboard');
+                } else {
+                    errorMessage("Invalid data received.");
+                }
+            } else {
+                errorMessage("Invalid response format.");
+            }
+        } catch (error) {
+            errorMessage("Server error. Please try again later.");
+            console.error("Error:", error);
+        }
+    };
+    
+
     const handleSignUp = () => {
-        console.log('Sign Up button clicked');
         navigate('/sign');
     };
 
     return (
-        <div>
-            <ThemeProvider theme={darkTheme}>
-                <CssBaseline />
+        <ThemeProvider theme={darkTheme}>
+            <CssBaseline />
+            <Box
+                sx={{
+                    minHeight: '100vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'black',
+                    p: 2,
+                }}
+            >
                 <Box
+                    component="form"
                     sx={{
-                        minHeight: '100vh',
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'black',
-                        p: 2,
+                        flexDirection: 'column',
+                        gap: 3,
+                        width: { xs: '90%', sm: '350px' },
+                        p: 4,
+                        borderRadius: 3,
+                        backgroundColor: '#121212',
+                        boxShadow: 5,
                     }}
                 >
-                    <Box
-                        component="form"
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 3,
-                            width: { xs: '90%', sm: '350px' },
-                            p: 4,
-                            borderRadius: 3,
-                            backgroundColor: '#121212',
-                            boxShadow: 5,
-                        }}
+                    <Typography variant="h4" textAlign="center" fontWeight="bold">
+                        Login
+                    </Typography>
+
+                    <TextField
+                        label="Email"
+                        variant="outlined"
+                        fullWidth
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+
+                    <TextField
+                        label="Username"
+                        variant="outlined"
+                        fullWidth
+                        value={username}
+                        onChange={(e) => setUserName(e.target.value)}
+                        required
+                    />
+
+                    <TextField
+                        label="Password"
+                        type="password"
+                        variant="outlined"
+                        fullWidth
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+
+                    <FormControlLabel
+                        control={<Checkbox checked={tandc} onChange={(e) => setTandc(e.target.checked)} />}
+                        label={<Typography>I agree to the Terms & Conditions</Typography>}
+                    />
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={handleLogin}
+                        disabled={!tandc}
                     >
-                        <Typography variant="h4" textAlign="center" fontWeight="bold">
-                            Login
-                        </Typography>
+                        Login
+                    </Button>
 
-                        <TextField
-                            label="Email"
-                            variant="outlined"
-                            fullWidth
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-
-                        <TextField
-                            label="Password"
-                            type="password"
-                            variant="outlined"
-                            fullWidth
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-
-                        <FormControl fullWidth>
-                            <InputLabel>Role</InputLabel>
-                            <Select
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
-                                input={<OutlinedInput label="Role" />}
-                            >
-                                {roles.map((role) => (
-                                    <MenuItem key={role} value={role}>{role}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <FormControlLabel
-                            control={<Checkbox checked={tandc} onChange={(e) => setTandc(e.target.checked)} />}
-                            label={<Typography>I agree to the Terms & Conditions</Typography>}
-                        />
-
-                        <Button variant="contained" color="primary" fullWidth onClick={handleLogin}>
-                            Login
-                        </Button>
-
-                        <Button variant="outlined" color="primary" fullWidth onClick={handleSignUp}>
-                            Sign Up
-                        </Button>
-                    </Box>
+                    <Button variant="outlined" color="primary" fullWidth onClick={handleSignUp}>
+                        Sign Up
+                    </Button>
                 </Box>
-            </ThemeProvider>
-        </div>
+            </Box>
+        </ThemeProvider>
     );
 }

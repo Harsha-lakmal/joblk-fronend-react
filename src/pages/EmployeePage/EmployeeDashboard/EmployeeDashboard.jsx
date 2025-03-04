@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import EmployeeSidebar from '../../../partials/EmployeeSidebar';
 import Header from '../../../partials/Header';
 import Datepicker from '../../../components/Datepicker';
-import DashboardCard13 from '../../../partials/dashboard/DashboardCard13';
 import Banner from '../../../comon/Banner/Banner';
 
 function EmployeeDashboard() {
@@ -47,7 +46,7 @@ function EmployeeDashboard() {
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
 
-              <DashboardCard13 />
+              {/* <DashboardCard13 /> */}
               
             </div>
 

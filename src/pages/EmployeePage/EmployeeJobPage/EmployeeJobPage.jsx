@@ -5,7 +5,6 @@ import Header from '../../../partials/Header';
 import FilterButton from '../../../components/DropdownFilter';
 import Datepicker from '../../../components/Datepicker';
 
-import DashboardCard13 from '../../../partials/dashboard/DashboardCard13';
 import Banner from '../../../comon/Banner/Banner';
 function EmployeeJobPage() {
 

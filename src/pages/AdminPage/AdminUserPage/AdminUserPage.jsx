@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 
 import Header from '../../../partials/Header';
 import Datepicker from '../../../components/Datepicker';
-import DashboardCard13 from '../../../partials/dashboard/DashboardCard13';
 import Banner from '../../../comon/Banner/Banner';
 import AdminSidebar from '../../../partials/AdminSidebar';
+import FilterButton from '../../../components/DropdownFilter'
+
 
 function AdminUserPage() {
 
@@ -36,9 +37,11 @@ function AdminUserPage() {
               {/* Right: Actions */}
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
                 {/* Filter button */}
+                <FilterButton align="right" />
+
 
                 {/* Datepicker built with React Day Picker */}
-                <Datepicker align="right" />
+                {/* <Datepicker align="right" /> */}
                             
               </div>
 
@@ -47,7 +50,6 @@ function AdminUserPage() {
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
 
-              <DashboardCard13 />
               
             </div>
 

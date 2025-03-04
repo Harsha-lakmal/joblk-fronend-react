@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import EmployeeSidebar from '../../../partials/EmployeeSidebar';
 import Header from '../../../partials/Header';
-import DashboardCard13 from '../../../partials/dashboard/DashboardCard13';
 import Banner from '../../../comon/Banner/Banner';
 
 function EmployeeCourse() {
@@ -45,7 +44,6 @@ function EmployeeCourse() {
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
 
-              <DashboardCard13 />
               
             </div>
 

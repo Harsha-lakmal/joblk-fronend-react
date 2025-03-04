@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 import Header from '../../../partials/Header';
-import DashboardCard13 from '../../../partials/dashboard/DashboardCard13';
 import Banner from '../../../comon/Banner/Banner';
 import TrainersSidebar from '../../../partials/TrainersSidebar'
 
@@ -45,7 +44,6 @@ function TrainersCourse() {
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
 
-              <DashboardCard13 />
               
             </div>
 

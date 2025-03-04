@@ -16,8 +16,7 @@ import {
     Select,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'
-
+import Swal from 'sweetalert2';
 
 const darkTheme = createTheme({
     palette: {
@@ -31,31 +30,27 @@ const darkTheme = createTheme({
     },
 });
 
-const roles = ["Employee", "Trainer"];
+const roles = ["Employee", "Trainer", "User" , "Admin"];
 
-
-function succes() {
+function showSuccessMessage() {
     Swal.fire({
         position: "top-end",
         icon: "success",
-        title: "Your Sign Successful",
+        title: "Sign Up Successful",
         showConfirmButton: false,
         timer: 2000
     });
 }
 
-function error() {
+function showErrorMessage(message) {
     Swal.fire({
         position: "top-end",
         icon: "error",
-        title: "Your Sign UnSuccessful",
+        title: message,
         showConfirmButton: false,
         timer: 2000
     });
-
 }
-
-
 
 export default function SignPage() {
     const [email, setEmail] = useState("");
@@ -66,45 +61,53 @@ export default function SignPage() {
     const [role, setRole] = useState("");
     const navigate = useNavigate();
 
-
-    const handleSignUp = (event) => {
+    const handleSignUp = async (event) => {
         event.preventDefault();
 
-        if (!email || !userName || !password || !confirmPassword) {
-            alert("Please fill in all fields.");
-            error();
+        if (!email || !userName || !password || !confirmPassword || !role) {
+            showErrorMessage("Please fill in all fields.");
             return;
         }
 
         if (password !== confirmPassword) {
-            error();
-            alert("Passwords do not match!");
+            showErrorMessage("Passwords do not match!");
             return;
         }
 
-        if (!role) {
-            error();
-            alert("Please select a role.");
-            return;
+        // if (!tandc) {
+        //     showErrorMessage("You must accept the Terms & Conditions.");
+        //     return;
+        // }
+
+        const data = {
+            username: userName,
+            password : password,
+            email  : email,
+            role  : role , 
+            imgPathProfile: "null",
+            imgPathCover: "null"
+        };
+
+        try {
+            const response = await fetch("http://localhost:8081/api/v1/user/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                showSuccessMessage();
+                setTimeout(() => navigate("/login"), 2000);
+            } else {
+                showErrorMessage("Sign Up Failed. Please try again.");
+            }
+        } catch (error) {
+            showErrorMessage("Server error. Please try again later.");
+            console.error("Error:", error);
         }
-        succes();
-
-        alert(
-            `Sign Up Successful!\n\nEmail: ${email}\nUsername: ${userName}\nRole: ${role}\nT&C Accepted: ${tandc}`
-        );
-
-        console.log("Email:", email);
-        console.log("Username:", userName);
-        console.log("Password:", password);
-        console.log("Role:", role);
-        console.log("T&C Accepted:", tandc);
     };
 
-    const handleLogin = () => {
-        console.log("Redirecting to login...");
-        navigate('/signup');
-
-    };
+    const handleLogin = () => navigate('/login');
 
     return (
         <ThemeProvider theme={darkTheme}>
