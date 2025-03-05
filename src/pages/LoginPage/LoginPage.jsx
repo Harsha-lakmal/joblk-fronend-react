@@ -3,12 +3,22 @@ import { Checkbox, TextField, Button, Typography, Box, FormControlLabel, ThemePr
 import { createTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { loginApi, setAuthToken } from '../../Service/Axios';
+import axios from 'axios';
 
 const darkTheme = createTheme({
     palette: {
         mode: 'dark',
         background: { default: '#000000' },
         text: { primary: '#ffffff' },
+    },
+});
+
+// Define userGetData instance
+const userGetData = axios.create({
+    baseURL: 'http://localhost:8081/api/v1/user',  // Your user API endpoint
+    headers: {
+        'Content-Type': 'application/json',
     },
 });
 
@@ -35,107 +45,68 @@ function errorMessage(msg) {
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [tandc, setTandc] = useState(false);
     const [username, setUserName] = useState('');
+    const [tandc, setTandc] = useState(false);
     const navigate = useNavigate();
 
-    const handleLogin = async () => {
-        if (!email || !password || !username) {
+    const handleLogin = () => {
+        if (!username || !password) {
             errorMessage("Please fill all fields.");
             return;
         }
 
-        handleGetUserData();
-        const data = { username, password };
-        
+        // Validate email format (Optional if email used)
+        // const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        // if (email && !emailPattern.test(email)) {
+        //     errorMessage("Please enter a valid email.");
+        //     return;
+        // }
 
-        try {
-            const response = await fetch("http://localhost:8081/api/v1/user/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-            });
+        // Using then and catch for handling the Promise
+        loginApi.post('/login', {
+            username: username,
+            password: password
+        })
+            .then((response) => {
+                if (response.data) {
+                    // Token save
+                    localStorage.setItem('authToken', response.data.token);  // Save the token
+                    setAuthToken(response.data);  // Set token to axios headers
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                errorMessage(errorText || "Login failed. Please check your credentials.");
-                return;
-            }
-
-            const result = await response.text();
-            if (result) {
-                const token = result.trim();
-                console.log(token);
-
-                if (token) {
-                    localStorage.setItem("token", token);
                     successMessage();
-
-                    
-                    
-                    // navigate('/admin/dashboard');
+                    getToken();
+                    fetchUserData();
                 } else {
-                    errorMessage("Invalid token received.");
+                    errorMessage(response.data.message || "Login failed!");
                 }
-            } else {
-                errorMessage("Invalid response format.");
-            }
-        } catch (error) {
-            errorMessage("Server error. Please try again later.");
-            console.error("Error:", error);
-        }
+            })
+            .catch((error) => {
+                console.error("Login error:", error);
+                errorMessage(error.response?.data?.message || "An error occurred. Try again.");
+            });
     };
 
+    // Retrieve token from localStorage
+    function getToken() {
+        const userdata = localStorage.getItem('authToken');
+        console.log(userdata);  
+        
+    }
 
-    const handleGetUserData = async () => {
+    const fetchUserData = async () => {
         try {
-            // Get the token from localStorage (assuming it's stored there)
-            const token = localStorage.getItem("token");  
-            if (!token) {
-                errorMessage("No token found. Please log in.");
-                return;
-            }
-    
-            // Use the token for authorization
-            const response = await fetch("http://localhost:8081/api/v1/user/getUser/"+ username, {
-                method: "GET",
+            const response = await userGetData.get(`/getUser/${username}`, {
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`, 
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                 },
             });
-    
-            // Check for a valid response
-            if (!response.ok) {
-                const errorText = await response.text(); // Get the error message from the response
-                errorMessage(errorText || "Not User! Try again.");
-                return;
-            }
-    
-            const result = await response.text();
-            if (result) {
-                const data = result.trim();
-                console.log(data); 
-    
-                if (data) {
-                    localStorage.setItem("data", data); // Store the data in localStorage
-                    successMessage(); // Show success message
-    
-                    // Navigate or take appropriate action after successful response
-                    // For example, you can navigate to a dashboard page
-                    // navigate('/admin/dashboard');
-                } else {
-                    errorMessage("Invalid data received.");
-                }
-            } else {
-                errorMessage("Invalid response format.");
-            }
+            console.log(response);
+            return response.data;
         } catch (error) {
-            errorMessage("Server error. Please try again later.");
-            console.error("Error:", error);
+            console.error('Error fetching user data:', error);
+            throw error;
         }
     };
-    
 
     const handleSignUp = () => {
         navigate('/sign');
@@ -177,7 +148,6 @@ export default function LoginPage() {
                         fullWidth
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        required
                     />
 
                     <TextField
