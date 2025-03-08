@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Header from '../../../partials/Header';
 import Banner from '../../../comon/Banner/Banner';
 import AdminSidebar from '../../../partials/AdminSidebar';
+import AddCourse from '../../../comon/AddCourse/AddCourse';
 function AdminCoursePage() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -35,6 +36,7 @@ function AdminCoursePage() {
                 {/* Filter button */}
                 {/* Datepicker built with React Day Picker */}
                 {/* Add view button */}
+                <AddCourse/>
                             
               </div>
 

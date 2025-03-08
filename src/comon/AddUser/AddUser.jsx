@@ -1,30 +1,57 @@
 import { useState } from "react";
-import './styles.css';
+import "./styles.css";
+import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx";
+import { tr } from "date-fns/locale/tr";
 
 function AddUser() {
   const [show, setShow] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "", password: "", email: "", role: "",
-    imgPathProfile: null, imgPathCover: null
-  });
   const [fileNames, setFileNames] = useState({
     imgPathProfile: "",
     imgPathCover: ""
   });
+  const [username, SetUsername] = useState("");
+  const [email, SetEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, SetRole] = useState("");
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-  const handleClear = () => setFormData({
-    username: "", password: "", email: "", role: "",
-    imgPathProfile: null, imgPathCover: null
-  });
 
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    setFormData({ ...formData, [name]: files[0] });
-    setFileNames({ ...fileNames, [name]: files[0].name }); // Store the file name
+  const handleClear = () => {
+    SetUsername("");
+    SetEmail("");
+    setPassword("");
+    SetRole("");
   };
+
+
+
+  const addUser = async () => {
+    
+    try {
+      const userData = {
+        username: username , 
+        password :password , 
+        email : email , 
+        role  : role
+      };
+
+      const userResponse = await instance.post(`/user/register`, userData);
+      uploadCoverImage();
+      uploadProfileImage();
+      alert(userResponse.data.message || "User added successfully!");
+      handleClear();
+      handleClose();
+    } catch (error) {
+      console.error("Error adding user:", error);
+      alert(error.response?.data?.message || "An error occurred. Try again.");
+    }
+  };
+
+
+
+
+    
 
   return (
     <div className="container">
@@ -37,53 +64,65 @@ function AddUser() {
               <button className="close-btn" onClick={handleClose}>&times;</button>
             </div>
             <div className="modal-body">
-              {Object.keys(formData).map((key) => (
-                key !== "imgPathProfile" && key !== "imgPathCover" ? (
-                  key === "role" ? (
-                    <div key={key} className="form-group">
-                      <label htmlFor={key}>Role</label>
-                      <select
-                        name={key}
-                        value={formData[key]}
-                        onChange={handleChange}
-                        className="role-dropdown"
-                      >
-                        {!formData[key] && <option value="">Select Role</option>} {/* Show only if no value selected */}
-                        <option value="Admin">Admin</option>
-                        <option value="Employee">Employee</option>
-                        <option value="Trainer">Trainer</option>
-                        <option value="Employees">Employees</option>
-                      </select>
-                    </div>
-                  ) : (
-                    <input
-                      key={key}
-                      type={key === "password" ? "password" : "text"}
-                      name={key}
-                      placeholder={key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
-                      value={formData[key]}
-                      onChange={handleChange}
-                    />
-                  )
-                ) : (
-                  <div key={key} className="file-upload">
-                    <label className="upload-label" htmlFor={key}>
-                      {key === "imgPathProfile" ? "Profile Image" : "Cover Image"}
-                    </label>
-                    <input
-                      id={key}
-                      type="file"
-                      name={key}
-                      onChange={handleFileChange}
-                    />
-                    {fileNames[key] && <span className="file-name">{fileNames[key]}</span>} {/* Display the file name */}
-                  </div>
-                )
-              ))}
+              {/* Username Input */}
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => SetUsername(e.target.value)}
+                />
+              </div>
+
+              {/* Password Input */}
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              {/* Email Input */}
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => SetEmail(e.target.value)}
+                />
+              </div>
+
+              {/* Role Dropdown */}
+              <div className="form-group">
+                <label htmlFor="role">Role</label>
+                <select
+                  name="role"
+                  value={role}
+                  onChange={(e) => SetRole(e.target.value)}
+                  className="role-dropdown"
+                >
+                  <option value="">Select Role</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Employee">Employee</option>
+                  <option value="Trainer">Trainer</option>
+                </select>
+              </div>
+              
             </div>
+            <br />  <br />
+            
+
             <div className="modal-footer">
               <button className="clear-btn" onClick={handleClear}>Clear</button>
-              <button className="save-btn" onClick={() => { console.log(formData); handleClose(); }}>Save</button>
+              <button className="save-btn" onClick={addUser}>Save</button>
               <button className="close-btn" onClick={handleClose}>Close</button>
             </div>
           </div>

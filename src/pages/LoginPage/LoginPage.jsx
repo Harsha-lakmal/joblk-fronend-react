@@ -3,8 +3,9 @@ import { Checkbox, TextField, Button, Typography, Box, FormControlLabel, ThemePr
 import { createTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { loginApi, setAuthToken } from '../../Service/Axios';
+import { instance, setAuthToken } from '../../Service/AxiosHolder/AxiosHolder';
 import axios from 'axios';
+
 
 const darkTheme = createTheme({
     palette: {
@@ -15,12 +16,7 @@ const darkTheme = createTheme({
 });
 
 // Define userGetData instance
-const userGetData = axios.create({
-    baseURL: 'http://localhost:8081/api/v1/user',  // Your user API endpoint
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+
 
 function successMessage() {
     Swal.fire({
@@ -55,7 +51,7 @@ export default function LoginPage() {
             return;
         }
 
-        // Validate email format (Optional if email used)
+        // // Validate email format if email is provided
         // const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         // if (email && !emailPattern.test(email)) {
         //     errorMessage("Please enter a valid email.");
@@ -63,19 +59,17 @@ export default function LoginPage() {
         // }
 
         // Using then and catch for handling the Promise
-        loginApi.post('/login', {
+        instance.post('/user/login', {
             username: username,
             password: password
         })
             .then((response) => {
                 if (response.data) {
                     // Token save
-                    localStorage.setItem('authToken', response.data.token);  // Save the token
-                    setAuthToken(response.data);  // Set token to axios headers
+                    setAuthToken(response.data);
 
                     successMessage();
-                    getToken();
-                    fetchUserData();
+                    fetchUserData();    // Fetch user data after successful login
                 } else {
                     errorMessage(response.data.message || "Login failed!");
                 }
@@ -86,25 +80,28 @@ export default function LoginPage() {
             });
     };
 
-    // Retrieve token from localStorage
-    function getToken() {
-        const userdata = localStorage.getItem('authToken');
-        console.log(userdata);  
-        
-    }
-
     const fetchUserData = async () => {
+ 
         try {
-            const response = await userGetData.get(`/getUser/${username}`, {
+            const response = await instance.get(`/user/getUser/${username}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                 },
             });
-            console.log(response);
+
+            localStorage.setItem("userData", JSON.stringify(response.data));
+            
+            console.log(response.data.role);
+            
+            if (response.data.role == "Admin") {
+                navigate('/admin/dashboard');
+
+            }
+
             return response.data;
         } catch (error) {
             console.error('Error fetching user data:', error);
-            throw error;
+            errorMessage("Could not fetch user data. Please try again.");
         }
     };
 
@@ -141,14 +138,15 @@ export default function LoginPage() {
                     <Typography variant="h4" textAlign="center" fontWeight="bold">
                         Login
                     </Typography>
-
+{/* 
                     <TextField
                         label="Email"
                         variant="outlined"
+                        disabled
                         fullWidth
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                    />
+                    /> */}
 
                     <TextField
                         label="Username"

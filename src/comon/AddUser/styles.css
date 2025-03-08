@@ -1,51 +1,168 @@
-.container { display: flex; justify-content: center; align-items: center; }
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; }
-.modal { background: white; padding: 15px; border-radius: 8px; width: 400px; box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3); }
-.modal-header { display: flex; justify-content: space-between; align-items: center; }
-.modal-body { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-.modal-footer { display: flex; justify-content: space-between; margin-top: 10px; }
-.open-modal-btn, .close-btn, .save-btn, .clear-btn { cursor: pointer; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; }
-.open-modal-btn { background: #007bff; color: white; }
-.close-btn { background: #6c757d; color: white; }
-.save-btn { background: #28a745; color: white; }
-.clear-btn { background: #ffc107; color: black; }
-.file-upload { display: flex; flex-direction: column; align-items: center; margin-top: 10px; }
-.upload-label { background: #17a2b8; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-#file-upload { display: none; }
-.file-upload input[type="file"] {
-    display: none; /* Hide the default file input */
-  }
-  
-  .file-upload .upload-label {
-    background: #17a2b8;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .file-upload .file-name {
-    margin-top: 10px;
-    display: block;
-    font-size: 14px;
-    color: #6c757d;
-  }
+/* Container for the button to open the modal */
+.container {
+  text-align: center;
+  position: relative;
+  bottom: 20px;
 
-  select.role-dropdown {
-    padding: 10px;
-    height: 40px;
-    font-size: 16px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 100%; /* Ensures the dropdown spans the full width of its container */
-  }
-  
-  select.role-dropdown:focus {
-    outline: none;
-    border-color: #17a2b8; /* Optional: Adds a focus effect with a color change */
-  }
-  
-  select.role-dropdown option {
-    font-size: 14px; /* Optional: Makes the options' font a bit smaller */
-  }
-  
+}
+
+.open-modal-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.open-modal-btn:hover {
+  background-color: #45a049;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.close-btn {
+  font-size: 18px;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: red;
+}
+
+/* Modal Body */
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+input, select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+input:focus, select:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+
+.role-dropdown {
+  cursor: pointer;
+}
+
+/* File Upload Section */
+.file-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-label {
+  font-size: 12px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  display: inline-block;
+  text-align: center;
+}
+
+input[type="file"] {
+  display: none; /* Hide the default file input */
+}
+
+.file-name {
+  font-size: 12px;
+  color: #777;
+}
+
+.image-preview {
+  max-width: 100%;
+  height: auto;
+  margin-top: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  padding: 4px;
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+button {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.save-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.clear-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: #45a049;
+}
+
+.clear-btn:hover {
+  background-color: #e53935;
+}

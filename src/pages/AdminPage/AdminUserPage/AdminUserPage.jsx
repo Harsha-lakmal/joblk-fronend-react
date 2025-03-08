@@ -5,6 +5,7 @@ import Datepicker from '../../../components/Datepicker';
 import Banner from '../../../comon/Banner/Banner';
 import AdminSidebar from '../../../partials/AdminSidebar';
 import FilterButton from '../../../components/DropdownFilter'
+import AddUser from '../../../comon/AddUser/AddUser';
 
 
 function AdminUserPage() {
@@ -37,8 +38,8 @@ function AdminUserPage() {
               {/* Right: Actions */}
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
                 {/* Filter button */}
-                <FilterButton align="right" />
 
+              <AddUser/>
 
                 {/* Datepicker built with React Day Picker */}
                 {/* <Datepicker align="right" /> */}

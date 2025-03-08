@@ -2,38 +2,40 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Transition from '../utils/Transition';
 import DefaultAvatar from '../assets/joblk.png';
-import { Token } from '@mui/icons-material';
+import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
 
 function DropdownProfile({ align }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [user, setUser] = useState({ name: 'Guest', type: '', profileImage: DefaultAvatar });
+  const [user, setUser] = useState({ profileImage: DefaultAvatar });
   const [uploading, setUploading] = useState(false);
-  const [img , setImg] = useState('');
+  const [img, setImg] = useState('');
 
   const trigger = useRef(null);
   const dropdown = useRef(null);
   const fileInputRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const storedUser = localStorage.getItem("userData");
 
-  // Load user data from localStorage & fetch profile image from DB when dropdown opens
   useEffect(() => {
-    const storedUser = localStorage.getItem("userData");
     const authToken = localStorage.getItem("authToken");
 
     if (storedUser) {
+      // console.log(storedUser);
+      
       const parsedUser = JSON.parse(storedUser);
+      
       setUser(parsedUser);
       if (parsedUser.id) {
-        getImgProfile(parsedUser.id); // Fetch the updated image from DB
+        getImgProfile(parsedUser.id);
       }
     }
 
     if (authToken) {
       setIsSignedIn(true);
     }
-  }, []);
+  }, [storedUser]);
 
   useEffect(() => {
     setDropdownOpen(false);
@@ -60,20 +62,16 @@ function DropdownProfile({ align }) {
     };
   }, [clickHandler, keyHandler]);
 
-  const handleSignIn = () => {
-    localStorage.setItem("authToken", "mockToken123"); // Simulated login
-    setIsSignedIn(true);
-    navigate('/dashboard'); // Redirect to dashboard after sign in
-  };
+ 
 
   const handleSignOut = () => {
-    console.log(Token);
-    
     localStorage.removeItem("authToken");
     localStorage.removeItem("userData");
-    setUser({ name: 'Guest', type: '', profileImage: DefaultAvatar });
     setIsSignedIn(false);
     setDropdownOpen(false);
+    navigate('/signup');
+
+    
   };
 
   const handleImageUpload = (event) => {
@@ -89,105 +87,80 @@ function DropdownProfile({ align }) {
     const reader = new FileReader();
     reader.onload = (e) => {
       const updatedUser = { ...user, profileImage: e.target.result };
-      setUser(updatedUser);
-      localStorage.setItem("userData", JSON.stringify(updatedUser));
+      // Don't update localStorage immediately
     };
     reader.readAsDataURL(file);
 
-    uploadProfileImage(file);
+    uploadProfileImage(file); // Upload the image to the server
   };
 
-  function uploadProfileImage(file) {
+  async function uploadProfileImage(file) {
     setUploading(true);
     const userId = user.id;
+
     const randomFileName = generateRandomFileName();
     const formData = new FormData();
     formData.append('file', file);
 
-    const url = `http://localhost:8081/api/v1/user/update/imageProfile/${userId}?file=${randomFileName}`;
-
-    fetch(url, {
-      method: 'PUT',
-      body: formData,
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to upload image');
-        }
-
-        const contentType = response.headers.get('Content-Type');
-        if (contentType && contentType.includes('application/json')) {
-          return response.json();
-        } else {
-          return response.text();
-        }
-      })
-      .then(data => {
-        if (typeof data === 'string') {
-          alert(data);
-        } else {
-          alert('Profile image updated successfully!');
-        }
-        setUploading(false);
-        getImgProfile(user.id); 
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating profile image.');
-        setUploading(false);
+    try {
+      const response = await instance.put(`/user/update/imageProfile/${userId}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'multipart/form-data',
+        },
       });
+
+      alert('Profile image updated successfully!');
+      getImgProfile(user.id); // Update profile image from the server
+
+      // Now update the localStorage with the new user data
+      const updatedUser = { ...user, profileImage: response.data.imageUrl };
+      localStorage.setItem("userData", JSON.stringify(updatedUser)); // Update localStorage
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      alert('Error updating profile image.');
+    } finally {
+      setUploading(false);
+    }
   }
 
-  function getImgProfile(userId) {
-    const url = `http://localhost:8081/api/v1/user/get/imageProfile/${userId}`;
-
-    fetch(url, {
-      method: 'GET',
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch profile image');
-        }
-
-        const contentType = response.headers.get('Content-Type');
-        if (contentType && contentType.includes('application/json')) {
-          return response.json();
-        } else {
-          return response.text();
-        }
-      })
-      .then(data => {
-        if (typeof data === 'string') {
-          // alert(data);
-          console.log(data);
-          setImg(data)
-
-          
-        } else if (data.profileImage) {
-          const updatedUser = { ...user, profileImage: data.profileImage };
-          setUser(updatedUser);
-          localStorage.setItem("userData", JSON.stringify(updatedUser));
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching profile image:', error);
+  async function getImgProfile(userId) {
+    try {
+      const response = await instance.get(`/user/get/imageProfile/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        responseType: 'blob', // Ensure the response is the image blob
       });
+
+      if (!response || !response.data) {
+        throw new Error("No profile image found");
+      }
+
+      const imageUrl = URL.createObjectURL(response.data);
+
+      if (imageUrl) {
+        setImg(imageUrl);// Update the profile image URL
+        const updatedUser = { ...user, profileImage: imageUrl };
+       
+      }
+    } catch (error) {
+      console.error('Error fetching user profile image:', error);
+      alert("Could not fetch user profile image. Please try again.");
+    }
   }
 
   function generateRandomFileName(length = 8) {
     return Math.random().toString(36).substring(2, 2 + length);
   }
 
+  const getdata = JSON.parse(storedUser);
+
   return (
     <div className="relative inline-flex">
       {!isSignedIn ? (
         <div className="flex space-x-4">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-4 rounded" onClick={handleSignIn}>
-            Sign In
-          </button>
-          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded" onClick={handleSignIn}>
-            Login
-          </button>
+          
         </div>
       ) : (
         <div>
@@ -196,22 +169,22 @@ function DropdownProfile({ align }) {
             className="inline-flex justify-center items-center group"
             aria-haspopup="true"
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            aria-expanded={dropdownOpen}
+            aria-expanded={dropdownOpen}  
           >
             <img
               className="w-8 h-8 rounded-full"
-              src={user.profileImage || DefaultAvatar} // Use profileImage or default avatar
+              src={img || user.profileImage || DefaultAvatar}
               width="32"
               height="32"
               alt="User"
             />
             <div className="flex items-center truncate">
               <span className="truncate ml-2 text-sm font-medium text-gray-600 dark:text-gray-100 group-hover:text-gray-800 dark:group-hover:text-white">
-                {user.name}
+                {getdata.username || 'Guest'}
               </span>
               <svg className="w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500" viewBox="0 0 12 12">
                 <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
-              </svg>  
+              </svg>
             </div>
           </button>
 
@@ -227,8 +200,8 @@ function DropdownProfile({ align }) {
           >
             <div ref={dropdown} onFocus={() => setDropdownOpen(true)} onBlur={() => setDropdownOpen(false)}>
               <div className="pt-0.5 pb-2 px-3 mb-1 border-b border-gray-200 dark:border-gray-700/60">
-                <div className="font-medium text-gray-800 dark:text-gray-100">{user.username}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 italic">{user.role || 'User'}</div>
+                <div className="font-medium text-gray-800 dark:text-gray-100">{getdata.username}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 italic">{getdata.role}</div>
               </div>
               <ul>
                 <li>
@@ -241,6 +214,7 @@ function DropdownProfile({ align }) {
                       ref={fileInputRef}
                       onChange={handleImageUpload}
                     />
+                    
                   </label>
                 </li>
                 <li>
@@ -261,6 +235,5 @@ function DropdownProfile({ align }) {
     </div>
   );
 }
-
 
 export default DropdownProfile;

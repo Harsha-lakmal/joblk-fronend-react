@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx"; // Adjust path if needed
+
 import {
     Checkbox,
     TextField,
@@ -16,8 +18,9 @@ import {
     Select,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
+// Dark theme setup
 const darkTheme = createTheme({
     palette: {
         mode: "dark",
@@ -30,25 +33,28 @@ const darkTheme = createTheme({
     },
 });
 
-const roles = ["Employee", "Trainer", "User" , "Admin"];
+// Available roles
+const roles = ["Employee", "Trainer", "User", "Admin"];
 
+// Success alert
 function showSuccessMessage() {
     Swal.fire({
         position: "top-end",
         icon: "success",
         title: "Sign Up Successful",
         showConfirmButton: false,
-        timer: 2000
+        timer: 2000,
     });
 }
 
+// Error alert
 function showErrorMessage(message) {
     Swal.fire({
         position: "top-end",
         icon: "error",
         title: message,
         showConfirmButton: false,
-        timer: 2000
+        timer: 2000,
     });
 }
 
@@ -64,6 +70,7 @@ export default function SignPage() {
     const handleSignUp = async (event) => {
         event.preventDefault();
 
+        // Validation
         if (!email || !userName || !password || !confirmPassword || !role) {
             showErrorMessage("Please fill in all fields.");
             return;
@@ -74,40 +81,32 @@ export default function SignPage() {
             return;
         }
 
-        // if (!tandc) {
-        //     showErrorMessage("You must accept the Terms & Conditions.");
-        //     return;
-        // }
 
         const data = {
             username: userName,
-            password : password,
-            email  : email,
-            role  : role , 
+            password: password,
+            email: email,
+            role: role,
             imgPathProfile: "null",
-            imgPathCover: "null"
+            imgPathCover: "null",
         };
 
         try {
-            const response = await fetch("http://localhost:8081/api/v1/user/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            });
+            const response = await instance.post("/user/register", data);
 
-            if (response.ok) {
+            if (response.status === 201 || response.status === 200) {
                 showSuccessMessage();
                 setTimeout(() => navigate("/login"), 2000);
             } else {
                 showErrorMessage("Sign Up Failed. Please try again.");
             }
         } catch (error) {
-            showErrorMessage("Server error. Please try again later.");
+            showErrorMessage(error.response?.data?.message || "Server error. Please try again later.");
             console.error("Error:", error);
         }
     };
 
-    const handleLogin = () => navigate('/login');
+    const handleLogin = () => navigate("/login");
 
     return (
         <ThemeProvider theme={darkTheme}>
