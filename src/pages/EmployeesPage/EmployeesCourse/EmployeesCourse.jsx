@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 
 import Header from '../../../partials/Header';
-import JobCard from '../../../comon/JobCard/JobCard';
 import Banner from '../../../comon/Banner/Banner';
 import EmployeesSidebar from '../../../partials/EmployeesSidebar';
-import AddJobs from '../../../comon/AddJobs/AddJobs';
-import AddCourse from '../../../comon/AddCourse/AddCourse';
-import AddUser from '../../../comon/AddUser/AddUser';
 import CourseCard from '../../../comon/CourseCard/CourseCard';
 
 function EmployeesCourse() {
@@ -33,7 +29,7 @@ function EmployeesCourse() {
 
               {/* Left: Title */}
               <div className="mb-4 sm:mb-0">
-                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">Employees Course  Page </h1>
+                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold"> Course  Page </h1>
               </div>
 
               {/* Right: Actions */}
@@ -48,12 +44,12 @@ function EmployeesCourse() {
             </div>
 
             {/* Cards */}
-            <div className="grid grid-cols-12 gap-6">
+            <div >
 
-            <JobCard/>
+            <CourseCard/>
         
 
-
+      
             </div>
 
           </div>

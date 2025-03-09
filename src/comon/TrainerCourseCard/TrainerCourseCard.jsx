@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import joblkimg from '../../Assets/joblk.png';
 import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx"; 
 
-function CourseCard() {
+function TrainerCourseCard() {
   const [courses, setCourses] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [courseImages, setCourseImages] = useState({}); 
+  const [courseImages, setCourseImages] = useState({});
   const token = localStorage.getItem('authToken');
 
   const handleFileChange = (e) => {
@@ -32,7 +32,7 @@ function CourseCard() {
       setLoading(false);
 
       response.data.content.forEach(course => {
-        getimg(course.courseId);
+        getimg(course.courseId); 
       });
     })
     .catch(error => {
@@ -144,31 +144,7 @@ function CourseCard() {
               </li>
             </ul>
 
-            <div className="mt-6 flex flex-col items-center space-y-4 w-full">
-              <label htmlFor="file-upload" className="text-sm font-medium text-gray-800 dark:text-gray-100">
-                Upload Your CV:
-              </label>
-              <div className="flex items-center space-x-4 w-full justify-center">
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept=".pdf, .docx, .txt"
-                  className="hidden"
-                  onChange={handleFileChange}
-                  aria-labelledby="file-upload"
-                />
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('file-upload').click()}
-                  className="bg-blue-500 text-white py-3 px-12 rounded-md focus:outline-none text-lg"
-                >
-                  Upload CV
-                </button>
-                {selectedFile && (
-                  <span className="ml-4 text-sm text-gray-600 dark:text-gray-400">{selectedFile}</span>
-                )}
-              </div>
-            </div>
+           <br />
           </div>
         </div>
       ))}
@@ -176,4 +152,4 @@ function CourseCard() {
   );
 }
 
-export default CourseCard;
+export default TrainerCourseCard;

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { instance, setAuthToken } from '../../Service/AxiosHolder/AxiosHolder';
 import axios from 'axios';
+import { el } from 'date-fns/locale';
 
 
 const darkTheme = createTheme({
@@ -96,6 +97,13 @@ export default function LoginPage() {
             if (response.data.role == "Admin") {
                 navigate('/admin/dashboard');
 
+            }else if (response.data.role == "Employee"){
+                navigate('/employee/dashboard');
+            }else if (response.data.role == "Employees"){
+                navigate('/employees/dashboard');
+            }
+            else if (response.data.role == "Trainer"){
+                navigate('/trainers/dashboard');
             }
 
             return response.data;

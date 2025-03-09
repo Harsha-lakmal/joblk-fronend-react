@@ -1,11 +1,9 @@
 import { useState } from "react";
 import "./styles.css";
 import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx";
-import { tr } from "date-fns/locale/tr";
 import Swal from "sweetalert2";
 
-
-function AddUser() {
+function UpdateUserCard() {
   const [show, setShow] = useState(false);
   const [fileNames, setFileNames] = useState({
     imgPathProfile: "",
@@ -15,16 +13,6 @@ function AddUser() {
   const [email, SetEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, SetRole] = useState("");
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  const handleClear = () => {
-    SetUsername("");
-    SetEmail("");
-    setPassword("");
-    SetRole("");
-  };
 
 
   function showSuccessMessage() {
@@ -47,41 +35,55 @@ function showErrorMessage(message) {
     });
 }
 
+  const storedUser = localStorage.getItem("userData");
+  const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+  const userId = parsedUser?.id;
+  const token = localStorage.getItem("authToken");
 
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const handleClear = () => {
+    SetUsername("");
+    SetEmail("");
+    setPassword("");
+    SetRole("");
+  };
 
   const addUser = async () => {
-    
     try {
       const userData = {
-        username: username , 
-        password :password , 
-        email : email , 
-        role  : role
+        id: userId,
+        username: username,
+        password: password,
+        email: email,
+        role: role
       };
 
-      const userResponse = await instance.post(`/user/register`, userData);
+      const userResponse = await instance.put(`/user/updateUser`, userData, {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
+      });
+
       showSuccessMessage();
+
       handleClear();
       handleClose();
     } catch (error) {
-      console.error("Error adding user:", error);
+      console.error("Error updating user:", error);
       showErrorMessage();
     }
   };
 
-
-
-
-    
-
   return (
     <div className="container">
-      <button className="open-modal-btn" onClick={handleShow}>Add User</button>
+      <button className="open-modal-btn" onClick={handleShow}>Update Your Account</button>
       {show && (
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h2>Add User</h2>
+              <h2>Update User</h2>
               <button className="close-btn" onClick={handleClose}>&times;</button>
             </div>
             <div className="modal-body">
@@ -132,10 +134,8 @@ function showErrorMessage(message) {
                   <option value="Trainer">Trainer</option>
                 </select>
               </div>
-              
             </div>
-            <br />  <br />
-            
+            <br /> <br />
 
             <div className="modal-footer">
               <button className="clear-btn" onClick={handleClear}>Clear</button>
@@ -149,4 +149,4 @@ function showErrorMessage(message) {
   );
 }
 
-export default AddUser;
+export default UpdateUserCard;

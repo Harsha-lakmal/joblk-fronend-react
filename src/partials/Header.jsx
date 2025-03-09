@@ -19,10 +19,8 @@ function Header({
       <div className="px-4 sm:px-6 lg:px-8">
         <div className={`flex items-center justify-between h-16 ${variant === 'v2' || variant === 'v3' ? '' : 'lg:border-b border-gray-200 dark:border-gray-700/60'}`}>
 
-          {/* Header: Left side */}
           <div className="flex">
 
-            {/* Hamburger button */}
             <button
               className="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 lg:hidden"
               aria-controls="sidebar"
@@ -39,7 +37,6 @@ function Header({
 
           </div>
 
-          {/* Header: Right side */}
           <div className="flex items-center space-x-3">
             <div>
               <button
@@ -64,7 +61,6 @@ function Header({
             <Notifications align="right" />
             <Help align="right" />
             <ThemeToggle />
-            {/*  Divider */}
             <hr className="w-px h-6 bg-gray-200 dark:bg-gray-700/60 border-none" />
             <UserMenu align="right" />
 

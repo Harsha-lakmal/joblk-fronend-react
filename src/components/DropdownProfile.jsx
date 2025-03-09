@@ -22,7 +22,6 @@ function DropdownProfile({ align }) {
     const authToken = localStorage.getItem("authToken");
 
     if (storedUser) {
-      // console.log(storedUser);
       
       const parsedUser = JSON.parse(storedUser);
       
@@ -87,14 +86,15 @@ function DropdownProfile({ align }) {
     const reader = new FileReader();
     reader.onload = (e) => {
       const updatedUser = { ...user, profileImage: e.target.result };
-      // Don't update localStorage immediately
     };
     reader.readAsDataURL(file);
 
-    uploadProfileImage(file); // Upload the image to the server
+    uploadProfileImage(file); 
   };
 
   async function uploadProfileImage(file) {
+    console.log(file);
+    
     setUploading(true);
     const userId = user.id;
 
@@ -111,11 +111,10 @@ function DropdownProfile({ align }) {
       });
 
       alert('Profile image updated successfully!');
-      getImgProfile(user.id); // Update profile image from the server
+      getImgProfile(user.id);
 
-      // Now update the localStorage with the new user data
       const updatedUser = { ...user, profileImage: response.data.imageUrl };
-      localStorage.setItem("userData", JSON.stringify(updatedUser)); // Update localStorage
+      localStorage.setItem("userData", JSON.stringify(updatedUser)); 
     } catch (error) {
       console.error('Error uploading profile image:', error);
       alert('Error updating profile image.');
@@ -130,7 +129,7 @@ function DropdownProfile({ align }) {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
-        responseType: 'blob', // Ensure the response is the image blob
+        responseType: 'blob', 
       });
 
       if (!response || !response.data) {
@@ -140,7 +139,7 @@ function DropdownProfile({ align }) {
       const imageUrl = URL.createObjectURL(response.data);
 
       if (imageUrl) {
-        setImg(imageUrl);// Update the profile image URL
+        setImg(imageUrl);
         const updatedUser = { ...user, profileImage: imageUrl };
        
       }
@@ -217,11 +216,7 @@ function DropdownProfile({ align }) {
                     
                   </label>
                 </li>
-                <li>
-                  <Link className="font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-1 px-3" to="/settings">
-                    Settings
-                  </Link>
-                </li>
+                
                 <li>
                   <button className="font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-1 px-3" onClick={handleSignOut}>
                     Sign Out

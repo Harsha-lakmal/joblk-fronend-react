@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx'; 
 
-function JobCard() {
+function EmployeesJobsCard() {
   const [jobs, setJobs] = useState([]); 
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null); 
   const [courseImages, setCourseImages] = useState({}); 
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
     if (token) {
-      getData(); 
+      getData(); //
     } else {
       setError('No authentication token found.');
       setLoading(false);
@@ -50,7 +50,7 @@ function JobCard() {
         const imageUrl = URL.createObjectURL(res.data);
         setCourseImages((prevImages) => ({
           ...prevImages,
-          [jobId]: imageUrl,
+          [jobId]: imageUrl, 
         }));
       })
       .catch((err) => {
@@ -84,7 +84,7 @@ function JobCard() {
           >
             <div className="relative w-full h-56">
               <img
-                src={courseImages[job.jobId] || '/path/to/default/image.jpg'} 
+                src={courseImages[job.jobId] || '/path/to/default/image.jpg'}
                 alt="Job Image"
                 className="w-full h-full object-cover"
               />
@@ -106,30 +106,7 @@ function JobCard() {
                   <p className="text-sm text-gray-600 dark:text-gray-400">Panadura</p>
                 </li>
               </ul>
-              <div className="mt-6">
-                <label
-                  htmlFor="file-upload"
-                  className="block text-sm font-medium text-gray-800 dark:text-gray-100"
-                >
-                  Upload Your CV:
-                </label>
-                <div className="mt-2 flex items-center space-x-4">
-                  <input
-                    id="file-upload"
-                    type="file"
-                    accept=".pdf, .docx, .txt"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => document.getElementById('file-upload').click()}
-                    className="bg-blue-500 text-white py-2 px-10 rounded-md"
-                  >
-                    Upload CV
-                  </button>
-                </div>
-              </div>
+              
             </div>
           </div>
         ))
@@ -138,4 +115,4 @@ function JobCard() {
   );
 }
 
-export default JobCard;
+export default EmployeesJobsCard;

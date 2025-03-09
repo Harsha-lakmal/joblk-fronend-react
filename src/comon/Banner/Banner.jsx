@@ -10,7 +10,6 @@ function Banner() {
 
   return (
     <>
-      {/* Message Icon */}
       <button 
         className="fixed bottom-4 right-4 z-50 bg-gray-800 text-gray-50 p-3 rounded-full shadow-lg hover:bg-gray-700"
         onClick={toggleBanner}
@@ -18,7 +17,6 @@ function Banner() {
         <MessageCircle className="w-6 h-6" />
       </button>
 
-      {/* Chat Banner */}
       {bannerOpen && (
         <div className="fixed bottom-0 right-0 w-full md:bottom-8 md:right-12 md:w-auto z-50">
           <div className="bg-gray-800 border border-transparent dark:border-gray-700/60 text-gray-50 text-sm p-3 md:rounded-sm shadow-lg flex justify-between">
