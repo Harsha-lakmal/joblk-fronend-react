@@ -96,11 +96,11 @@ function AdminJobsController() {
 
         const updatedJob = { 
             jobId: jobToUpdate.jobId,  
-            jobTitle,
-            jobDescription,
+            jobTitle  : jobTitle  , 
+            jobDescription : jobDescription , 
             qualifications: jobQualifications,
-            jobClosingDate,
-            imgPath
+            jobClosingDate : jobClosingDate
+        
         };
 
         instance.put(`/job/updateJob`, updatedJob, {
