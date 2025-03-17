@@ -127,7 +127,7 @@ function showErrorMessage(message) {
                   className="role-dropdown"
                 >
                   <option value="">Select Role</option>
-                  <option value="Admin">Employees</option>
+                  <option value="Employees">Employees</option>
                   <option value="Employee">Employee</option>
                   <option value="Trainer">Trainer</option>
                 </select>

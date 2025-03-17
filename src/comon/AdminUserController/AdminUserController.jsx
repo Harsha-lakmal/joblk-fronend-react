@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { instance } from '../../Service/AxiosHolder/AxiosHolder'
+import { instance } from '../../Service/AxiosHolder/AxiosHolder';
 import Swal from 'sweetalert2';
 
 function AdminUserController() {
@@ -13,6 +13,7 @@ function AdminUserController() {
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('');
     const token = localStorage.getItem('authToken');
+    const [lastFetchedData, setLastFetchedData] = useState([]);
 
     function successMessage() {
         Swal.fire({
@@ -36,9 +37,15 @@ function AdminUserController() {
 
     useEffect(() => {
         getData();
+        const interval = setInterval(() => {
+            checkForChanges();
+        }, 5000);
+
+        return () => clearInterval(interval);
     }, []);
 
     function getData() {
+        setLoading(true);
         instance.get('/user/getAllUsers', {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -46,11 +53,29 @@ function AdminUserController() {
         })
         .then(response => {
             setUsers(response.data);
+            setLastFetchedData(response.data);
             setLoading(false);
         })
         .catch(error => {
             setError("Failed to load users.");
             setLoading(false);
+        });
+    }
+
+    function checkForChanges() {
+        instance.get('/user/getAllUsers', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (JSON.stringify(response.data) !== JSON.stringify(lastFetchedData)) {
+                setUsers(response.data);
+                setLastFetchedData(response.data); 
+            }
+        })
+        .catch(error => {
+            setError("Failed to load users.");
         });
     }
 
@@ -61,8 +86,8 @@ function AdminUserController() {
             }
         })
         .then(() => {
-            setUsers(users.filter(user => user.id !== id));
             successMessage();
+            getData();
         })
         .catch(err => {
             errorMessage();
@@ -73,7 +98,7 @@ function AdminUserController() {
         setUserToUpdate(user);
         setUsername(user.username);
         setEmail(user.email);
-        setPassword('');  
+        setPassword('update');  
         setRole(user.role);
         setModalOpen(true);
     };
@@ -95,12 +120,9 @@ function AdminUserController() {
             }
         })
         .then(response => {
-            const updatedUsers = users.map(user => 
-                user.id === userToUpdate.id ? { ...user, ...response.data } : user
-            );
-            setUsers(updatedUsers);
-            setModalOpen(false); 
             successMessage();
+            getData(); 
+            setModalOpen(false);
         })
         .catch(err => {
             errorMessage("Failed to update user.");
@@ -136,6 +158,13 @@ function AdminUserController() {
         <div className="overflow-x-auto">
             {loading && <div className="text-center">Loading...</div>}
             {error && <div className="text-center text-red-500">{error}</div>}
+
+            {/* <button 
+                onClick={() => getData()}  // Fetch data when clicked
+                className="mb-4 bg-green-500 text-white py-2 px-4 rounded"
+            >
+                Refresh Data
+            </button> */}
 
             <table className="min-w-full table-auto border-collapse">
                 <thead>

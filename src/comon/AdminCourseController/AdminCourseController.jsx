@@ -14,7 +14,7 @@ function AdminCourseController() {
     const [courseQualification, setCourseQualification] = useState('');
     const [courseContent, setCourseContent] = useState('');
     const [courseStartDate, setCourseStartDate] = useState('');
-    const [imgPath, setImgPath] = useState('');
+    const [loadingAction, setLoadingAction] = useState(false); // Loading state for actions
     const token = localStorage.getItem('authToken');
 
     function successMessage() {
@@ -37,10 +37,7 @@ function AdminCourseController() {
         });
     }
 
-    useEffect(() => {
-        getData();
-    }, []);
-
+    // Fetch course data
     const getData = () => {
         if (!token) {
             setError("You are not authorized. Please log in again.");
@@ -54,36 +51,53 @@ function AdminCourseController() {
             }
         })
         .then(response => {
-            setCourses(response.data.content); 
-            setLoading(false);
+            setCourses(response.data.content); // Set courses in the state
+            setLoading(false);  // Stop loading
         })
         .catch(async (error) => {
             if (error.response && error.response.status === 403) {
-       
                 const newToken = await refreshToken();
-                getData(newToken); 
+                getData(newToken);  // Retry with new token
             } else {
                 setError("Failed to load courses.");
-                setLoading(false);
+                setLoading(false);  // Stop loading on error
             }
         });
     };
 
+    useEffect(() => {
+        // Fetch data on initial load
+        getData();
+        
+        // Set up automatic refresh every 60 seconds (1 minute)
+        const refreshInterval = setInterval(() => {
+            getData();
+        }, 30000); // 60000 milliseconds = 1 minute
+        
+        // Clear the interval when component unmounts
+        return () => clearInterval(refreshInterval);
+    }, []);
+
+    // Handle course deletion
     const handleDelete = (id) => {
+        setLoadingAction(true); // Show loading during delete
         instance.delete(`/course/deleteCourse/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         })
         .then(() => {
-            setCourses(courses.filter(course => course.courseId !== id));
             successMessage();
+            getData(); // Refresh table after delete
+            setLoadingAction(false); // Hide loading after delete
         })
         .catch(err => {
             errorMessage();
+            setLoadingAction(false); // Hide loading on error
         });
     };
 
+    // Handle course update
     const handleUpdate = (course) => {
         setCourseToUpdate(course);
         setCourseTitle(course.courseTitle);
@@ -95,8 +109,10 @@ function AdminCourseController() {
         setModalOpen(true);
     };
 
+    // Handle update form submission
     const handleSubmitUpdate = (e) => {
         e.preventDefault();
+        setLoadingAction(true); // Show loading during update
 
         const updatedCourse = { 
             courseId: courseToUpdate.courseId,  
@@ -106,24 +122,46 @@ function AdminCourseController() {
             courseQualification,
             courseContent,
             courseStartDate
-        
         };
+
+        console.log("🚀 Sending Update Request:", updatedCourse); // ✅ Debugging Log
 
         instance.put(`/course/updateCourse`, updatedCourse, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         })
-        .then(response => {
-            const updatedCourses = courses.map(course => 
-                course.courseId === courseToUpdate.courseId ? { ...course, ...response.data } : course
-            );
-            setCourses(updatedCourses);
-            setModalOpen(false); 
+        .then((res) => {
+            console.log("✅ Update Success:", res.data); // ✅ Debugging Log
             successMessage();
+            getData(); // Refresh table after update
+            setModalOpen(false);
+        })
+        .catch((err) => {
+            console.error("❌ Update Error:", err.response); // ✅ Debugging Log
+            errorMessage("Failed to update course.");
+        })
+        .finally(() => {
+            setLoadingAction(false);
+        });
+    };
+
+    // Handle new course addition
+    const handleAddCourse = (newCourseData) => {
+        setLoadingAction(true); // Show loading during add
+        instance.post('/course/addCourse', newCourseData, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(() => {
+            successMessage();
+            getData(); // Refresh data after adding new course
+            setLoadingAction(false); // Hide loading after add
         })
         .catch(err => {
-            errorMessage("Failed to update course.");
+            errorMessage("Failed to add course.");
+            setLoadingAction(false); // Hide loading on error
         });
     };
 
@@ -131,6 +169,16 @@ function AdminCourseController() {
         <div className="overflow-x-auto">
             {loading && <div className="text-center">Loading...</div>}
             {error && <div className="text-center text-red-500">{error}</div>}
+
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Course List</h2>
+                <button
+                    onClick={getData}
+                    className="bg-blue-500 text-white py-1 px-4 rounded"
+                >
+                    Refresh
+                </button>
+            </div>
 
             <table className="min-w-full table-auto border-collapse text-sm">
                 <thead>
@@ -249,7 +297,7 @@ function AdminCourseController() {
                                 >
                                     Cancel
                                 </button>
-                                <button 
+                                <button     
                                     type="submit" 
                                     className="bg-blue-500 text-white py-1 px-4 rounded"
                                 >
