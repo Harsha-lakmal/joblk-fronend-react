@@ -9,25 +9,30 @@ function JobCard() {
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
-    if (token) {
-      getData(); 
-    } else {
+    if (!token) {
       setError('No authentication token found.');
       setLoading(false);
+      return;
     }
-  }, [token]); 
+    getData();
+    const interval = setInterval(() => {
+      getData();
+    }, 40000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   function getData() {
+    if (!token) return;
     instance
       .get('/job/getAllJobs', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       })
       .then((response) => {
         setJobs(response.data.content);
+        const newImages = {};
         response.data.content.forEach((job) => {
-          getimg(job.jobId); 
+          getimg(job.jobId, newImages);
         });
         setLoading(false);
       })
@@ -38,29 +43,26 @@ function JobCard() {
       });
   }
 
-  const getimg = (jobId) => {
+  const getimg = (jobId, newImages) => {
     instance
       .get(`/job/get/image/${jobId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         responseType: 'blob',
       })
       .then((res) => {
-        const imageUrl = URL.createObjectURL(res.data);
-        setCourseImages((prevImages) => ({
-          ...prevImages,
-          [jobId]: imageUrl,
-        }));
+        newImages[jobId] = URL.createObjectURL(res.data);
+        setCourseImages((prevImages) => ({ ...prevImages, ...newImages }));
       })
       .catch((err) => {
-        console.error('Error fetching image:', err.response || err);
+        console.error('Error fetching image:', err);
       });
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      console.log('Selected file:', file);
+      // Implement upload logic here
     }
   };
 
@@ -107,10 +109,7 @@ function JobCard() {
                 </li>
               </ul>
               <div className="mt-6">
-                <label
-                  htmlFor="file-upload"
-                  className="block text-sm font-medium text-gray-800 dark:text-gray-100"
-                >
+                <label htmlFor="file-upload" className="block text-sm font-medium text-gray-800 dark:text-gray-100">
                   Upload Your CV:
                 </label>
                 <div className="mt-2 flex items-center space-x-4">

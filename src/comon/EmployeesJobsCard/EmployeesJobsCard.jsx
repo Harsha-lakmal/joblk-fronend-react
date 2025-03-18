@@ -1,23 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx'; 
+import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
 
 function EmployeesJobsCard() {
-  const [jobs, setJobs] = useState([]); 
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); 
-  const [courseImages, setCourseImages] = useState({}); 
+  const [error, setError] = useState(null);
+  const [courseImages, setCourseImages] = useState({});
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
     if (token) {
-      getData(); //
+      getData(); // Fetch jobs if the token exists
     } else {
       setError('No authentication token found.');
       setLoading(false);
     }
-  }, [token]); 
+  }, [token]);
 
-  function getData() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (token) {
+        checkForChanges(); // Use this for periodic checks
+      }
+    }, 4000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, [token]);
+
+  const getData = () => {
+    setLoading(true); // Set loading true before fetching data
     instance
       .get('/job/getAllJobs', {
         headers: {
@@ -27,7 +39,7 @@ function EmployeesJobsCard() {
       .then((response) => {
         setJobs(response.data.content);
         response.data.content.forEach((job) => {
-          getimg(job.jobId); 
+          getimg(job.jobId);
         });
         setLoading(false);
       })
@@ -36,7 +48,7 @@ function EmployeesJobsCard() {
         setLoading(false);
         console.error(error);
       });
-  }
+  };
 
   const getimg = (jobId) => {
     instance
@@ -50,7 +62,7 @@ function EmployeesJobsCard() {
         const imageUrl = URL.createObjectURL(res.data);
         setCourseImages((prevImages) => ({
           ...prevImages,
-          [jobId]: imageUrl, 
+          [jobId]: imageUrl, // Store the image URL in state
         }));
       })
       .catch((err) => {
@@ -58,10 +70,9 @@ function EmployeesJobsCard() {
       });
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-    }
+  const checkForChanges = () => {
+    // Implement logic to check for changes if necessary
+    console.log('Checking for changes...');
   };
 
   if (loading) {
@@ -106,7 +117,6 @@ function EmployeesJobsCard() {
                   <p className="text-sm text-gray-600 dark:text-gray-400">Panadura</p>
                 </li>
               </ul>
-              
             </div>
           </div>
         ))

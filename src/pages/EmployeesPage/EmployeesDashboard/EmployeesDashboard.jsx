@@ -26,7 +26,7 @@ function EmployeesDashboard() {
             <div className="sm:flex sm:justify-between sm:items-center mb-8">
 
               <div className="mb-4 sm:mb-0">
-                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold"> Home Page </h1>
+                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">  </h1>
               </div>
 
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
@@ -35,9 +35,22 @@ function EmployeesDashboard() {
 
             </div>
             <div >
-              <EmployeesJobsCard/>
-              <br />
-              <CourseCard/>
+             
+            </div>
+
+
+            <div className="space-y-8">
+              {/* Courses Section */}
+              <section>
+                <h2 className="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-semibold mb-4">Available Courses</h2>
+                <CourseCard />
+              </section>
+
+              {/* Jobs Section */}
+              <section>
+                <h2 className="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-semibold mb-4">Job Opportunities</h2>
+                <EmployeesJobsCard/>
+                </section>
             </div>
 
           </div>

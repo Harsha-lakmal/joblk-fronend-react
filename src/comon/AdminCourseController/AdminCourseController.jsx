@@ -14,7 +14,7 @@ function AdminCourseController() {
     const [courseQualification, setCourseQualification] = useState('');
     const [courseContent, setCourseContent] = useState('');
     const [courseStartDate, setCourseStartDate] = useState('');
-    const [loadingAction, setLoadingAction] = useState(false); // Loading state for actions
+    const [loadingAction, setLoadingAction] = useState(false); 
     const token = localStorage.getItem('authToken');
 
     function successMessage() {
@@ -37,7 +37,6 @@ function AdminCourseController() {
         });
     }
 
-    // Fetch course data
     const getData = () => {
         if (!token) {
             setError("You are not authorized. Please log in again.");
@@ -51,36 +50,32 @@ function AdminCourseController() {
             }
         })
         .then(response => {
-            setCourses(response.data.content); // Set courses in the state
-            setLoading(false);  // Stop loading
+            setCourses(response.data.content); 
+            setLoading(false);  
         })
         .catch(async (error) => {
             if (error.response && error.response.status === 403) {
                 const newToken = await refreshToken();
-                getData(newToken);  // Retry with new token
+                getData(newToken);  
             } else {
                 setError("Failed to load courses.");
-                setLoading(false);  // Stop loading on error
+                setLoading(false);  
             }
         });
     };
 
     useEffect(() => {
-        // Fetch data on initial load
         getData();
         
-        // Set up automatic refresh every 60 seconds (1 minute)
         const refreshInterval = setInterval(() => {
             getData();
-        }, 30000); // 60000 milliseconds = 1 minute
+        }, 50); 
         
-        // Clear the interval when component unmounts
         return () => clearInterval(refreshInterval);
     }, []);
 
-    // Handle course deletion
     const handleDelete = (id) => {
-        setLoadingAction(true); // Show loading during delete
+        setLoadingAction(true); 
         instance.delete(`/course/deleteCourse/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -88,16 +83,15 @@ function AdminCourseController() {
         })
         .then(() => {
             successMessage();
-            getData(); // Refresh table after delete
-            setLoadingAction(false); // Hide loading after delete
+            getData();
+            setLoadingAction(false);
         })
         .catch(err => {
             errorMessage();
-            setLoadingAction(false); // Hide loading on error
+            setLoadingAction(false); 
         });
     };
 
-    // Handle course update
     const handleUpdate = (course) => {
         setCourseToUpdate(course);
         setCourseTitle(course.courseTitle);
@@ -109,10 +103,9 @@ function AdminCourseController() {
         setModalOpen(true);
     };
 
-    // Handle update form submission
     const handleSubmitUpdate = (e) => {
         e.preventDefault();
-        setLoadingAction(true); // Show loading during update
+        setLoadingAction(true); 
 
         const updatedCourse = { 
             courseId: courseToUpdate.courseId,  
@@ -124,7 +117,7 @@ function AdminCourseController() {
             courseStartDate
         };
 
-        console.log("🚀 Sending Update Request:", updatedCourse); // ✅ Debugging Log
+        console.log("🚀 Sending Update Request:", updatedCourse); 
 
         instance.put(`/course/updateCourse`, updatedCourse, {
             headers: {
@@ -132,13 +125,13 @@ function AdminCourseController() {
             }
         })
         .then((res) => {
-            console.log("✅ Update Success:", res.data); // ✅ Debugging Log
+            console.log("✅ Update Success:", res.data); 
             successMessage();
-            getData(); // Refresh table after update
+            getData(); 
             setModalOpen(false);
         })
         .catch((err) => {
-            console.error("❌ Update Error:", err.response); // ✅ Debugging Log
+            console.error("❌ Update Error:", err.response); 
             errorMessage("Failed to update course.");
         })
         .finally(() => {
@@ -146,9 +139,8 @@ function AdminCourseController() {
         });
     };
 
-    // Handle new course addition
     const handleAddCourse = (newCourseData) => {
-        setLoadingAction(true); // Show loading during add
+        setLoadingAction(true); 
         instance.post('/course/addCourse', newCourseData, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -156,12 +148,12 @@ function AdminCourseController() {
         })
         .then(() => {
             successMessage();
-            getData(); // Refresh data after adding new course
-            setLoadingAction(false); // Hide loading after add
+            getData(); 
+            setLoadingAction(false); 
         })
         .catch(err => {
             errorMessage("Failed to add course.");
-            setLoadingAction(false); // Hide loading on error
+            setLoadingAction(false); 
         });
     };
 
@@ -169,7 +161,7 @@ function AdminCourseController() {
         <div className="overflow-x-auto">
             {loading && <div className="text-center">Loading...</div>}
             {error && <div className="text-center text-red-500">{error}</div>}
-
+{/* 
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Course List</h2>
                 <button
@@ -178,7 +170,7 @@ function AdminCourseController() {
                 >
                     Refresh
                 </button>
-            </div>
+            </div> */}
 
             <table className="min-w-full table-auto border-collapse text-sm">
                 <thead>

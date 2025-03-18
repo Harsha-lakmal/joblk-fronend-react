@@ -18,8 +18,11 @@ function TrainerCourseCard() {
   };
 
   useEffect(() => {
-    getData(); 
-  }, []); 
+    getData();
+    const interval = setInterval(() => {
+      checkForChanges();
+    }, 40000);
+  }, []);
 
   function getData() {
     instance.get('/course/getAllCourse', {
@@ -62,6 +65,7 @@ function TrainerCourseCard() {
     });
   };
 
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {loading && <div className="text-center col-span-full">Loading...</div>}
@@ -84,11 +88,6 @@ function TrainerCourseCard() {
 
             <ul className="space-y-6 text-left w-full">
               <li className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white">
-                  <svg className="w-6 h-6 fill-current" viewBox="0 0 36 36">
-                    <path d="M17.7 24.7l1.4-1.4-4.3-4.3H25v-2H14.8l4.3-4.3-1.4-1.4L11 18z" />
-                  </svg>
-                </div>
                 <div className="flex-1">
                   <span className="font-medium text-lg text-gray-800 dark:text-gray-100">Course Description:</span>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{course.courseDescription}</p>
@@ -96,11 +95,6 @@ function TrainerCourseCard() {
               </li>
 
               <li className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white">
-                  <svg className="w-6 h-6 fill-current" viewBox="0 0 36 36">
-                    <path d="M17.7 24.7l1.4-1.4-4.3-4.3H25v-2H14.8l4.3-4.3-1.4-1.4L11 18z" />
-                  </svg>
-                </div>
                 <div className="flex-1">
                   <span className="font-medium text-lg text-gray-800 dark:text-gray-100">Course Content:</span>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{course.courseContent}</p>
@@ -108,11 +102,6 @@ function TrainerCourseCard() {
               </li>
 
               <li className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white">
-                  <svg className="w-6 h-6 fill-current" viewBox="0 0 36 36">
-                    <path d="M17.7 24.7l1.4-1.4-4.3-4.3H25v-2H14.8l4.3-4.3-1.4-1.4L11 18z" />
-                  </svg>
-                </div>
                 <div className="flex-1">
                   <span className="font-medium text-lg text-gray-800 dark:text-gray-100">Course Qualifications:</span>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{course.courseQualification}</p>
@@ -120,11 +109,6 @@ function TrainerCourseCard() {
               </li>
 
               <li className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white">
-                  <svg className="w-6 h-6 fill-current" viewBox="0 0 36 36">
-                    <path d="M17.7 24.7l1.4-1.4-4.3-4.3H25v-2H14.8l4.3-4.3-1.4-1.4L11 18z" />
-                  </svg>
-                </div>
                 <div className="flex-1">
                   <span className="font-medium text-lg text-gray-800 dark:text-gray-100">Course Start Date:</span>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{course.courseStartDate}</p>
@@ -132,11 +116,6 @@ function TrainerCourseCard() {
               </li>
 
               <li className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white">
-                  <svg className="w-6 h-6 fill-current" viewBox="0 0 36 36">
-                    <path d="M17.7 24.7l1.4-1.4-4.3-4.3H25v-2H14.8l4.3-4.3-1.4-1.4L11 18z" />
-                  </svg>
-                </div>
                 <div className="flex-1">
                   <span className="font-medium text-lg text-gray-800 dark:text-gray-100">Course Location:</span>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{course.courseLocation}</p>
