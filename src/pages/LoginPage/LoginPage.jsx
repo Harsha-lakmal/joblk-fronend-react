@@ -98,7 +98,7 @@ export default function LoginPage() {
                 navigate('/admin/dashboard');
 
             }else if (response.data.role == "Employee"){
-                navigate('/employee/dashboard');
+                navigate('/error');
             }else if (response.data.role == "Employees"){
                 navigate('/employees/dashboard');
             }
@@ -168,7 +168,7 @@ export default function LoginPage() {
                     <TextField
                         label="Password"
                         type="password"
-                        variant="outlined"
+                        variant="outlined"  
                         fullWidth
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}

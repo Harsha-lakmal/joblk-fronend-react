@@ -23,6 +23,7 @@ import AdminJobPage from '../pages/AdminPage/AdminJobPage/AdminJobPage';
 import LoginPage from '../pages/LoginPage/LoginPage';
 import SignPage from '../pages/SignPage/SignPage'
 import SettingPage from '../pages/SettingPage/SettingPage'
+import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
 function App() {
   const location = useLocation();
 
@@ -52,8 +53,10 @@ function App() {
       <Route path="/admin/dashboard" element={<AdminUserPage />} />
       <Route path="/admin/dashboard/job" element={<AdminJobPage />} />
       <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />    
-
+      <Route path="/error" element={<NotFoundPage />} />    
     </Routes>
+   
+
   );
 }
 

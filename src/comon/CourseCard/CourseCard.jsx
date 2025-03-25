@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import joblkimg from "../../Assets/joblk.png";
 import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx";
+import joblkimg from "../../Assets/joblk.png";
 
 function CourseCard() {
   const [courses, setCourses] = useState([]);
