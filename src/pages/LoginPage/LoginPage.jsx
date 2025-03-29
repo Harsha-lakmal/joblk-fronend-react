@@ -4,8 +4,6 @@ import { createTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { instance, setAuthToken } from '../../Service/AxiosHolder/AxiosHolder';
-import axios from 'axios';
-import { el } from 'date-fns/locale';
 
 
 const darkTheme = createTheme({

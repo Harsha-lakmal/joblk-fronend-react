@@ -24,7 +24,7 @@ const NotFoundPage = () => {
             > 
                 Go to Signup
             </button>
-        </div>
+        </div> 
     );
 };
 
