@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { MessageCircle } from 'lucide-react';
 
 const Banner = () => {
   const [messages, setMessages] = useState([]);
@@ -9,16 +10,59 @@ const Banner = () => {
 
   const botResponses = [
     {
+      keywords: ['hello'],
+      responses: ["Hello there! ,What help do you need from me?"],
+    },
+
+    {
+      keywords: [ 'hi'],
+      responses: ["Hi! How can I help you?"],
+    },
+    {
+      keywords: [ 'hey'],
+      responses: [ "Hey! What's up?"],
+    },
+    {
       keywords: ['hello', 'hi', 'hey'],
       responses: ["Hello there!", "Hi! How can I help you?", "Hey! What's up?"],
     },
     {
-      keywords: ['how are you', "how's it going"],
-      responses: ["I'm doing well, thank you!", "I'm just a bot, but I'm functioning perfectly!", "All systems operational!"],
+      keywords: ['Job Details'],
+      responses: ["You can find out about our job opportunities through our posts. If you have any questions, you can contact us."],
+    },
+    {
+      keywords: ['course Details'],
+      responses: ["You can find out about our course opportunities through our posts. If you have any questions, you can contact us."],
+    },
+
+    {
+      keywords: ['how are you'] , 
+      responses: ["I'm doing well, thank you!"],
+    },
+    {
+      keywords: [ "how's it going"],
+      responses: [ "I'm just a bot, but I'm functioning perfectly!"],
     },
     {
       keywords: ['thanks', 'thank you'],
       responses: ["You're welcome!", "Happy to help!", "No problem at all!"],
+    },
+    
+    {
+      keywords: ['thanks'],
+      responses: ["You're welcome!"],
+    },
+    {
+      keywords: ['Good morning'],
+      responses: ["Good morning . Welcome to Joblk Sport Team "],
+    },
+    {
+      keywords: ['Good evining  '],
+      responses: ["Good eviing , Welcome to joblk Sport team "],
+    },
+    {
+      keywords: [ 'thank you'],
+      responses: [ "Happy to help!"],
     },
     {
       keywords: ['bye', 'goodbye'],
@@ -27,9 +71,7 @@ const Banner = () => {
     {
       keywords: ['default'],
       responses: [
-        "I'm not sure I understand. Can you rephrase that?",
-        "Interesting! Tell me more.",
-        "I'm still learning. Could you ask me something else?",
+        "I don't understand what you're saying. What do you need my help with?",
       ],
     },
   ];
@@ -39,6 +81,7 @@ const Banner = () => {
       setTimeout(() => {
         addBotMessage(getRandomResponse(['Hi there!', 'Hello! How can I help?', 'Welcome!']));
       }, 500);
+
     }
   }, [isChatOpen]);
 
@@ -105,6 +148,8 @@ const Banner = () => {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSend();
+      console.log("input message : "+inputMessage);
+      
     }
   };
 
@@ -131,15 +176,20 @@ const Banner = () => {
           }} 
           onClick={toggleChat}
         >
-          <img 
-            src="/api/placeholder/40/40" 
-            alt="Chat bot icon"
-            style={{
-              width: '40px',
-              height: '40px',
-              filter: 'brightness(0) invert(1)',
-            }} 
-          />
+          {/* Message Circle Icon */}
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="40" 
+            height="40" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="white" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          >
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+          </svg>
         </button>
       )}
 
@@ -162,34 +212,52 @@ const Banner = () => {
             borderTopLeftRadius: '10px',
             borderTopRightRadius: '10px',
           }}>
-            <span style={{
-              color: '#fff',
-              fontSize: '20px',
-              fontWeight: 'bold',
-            }}>ChatBot</span>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              {/* Chat Icon in header */}
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="white" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                style={{ marginRight: '10px' }}
+              >
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+              <span style={{
+                color: '#fff',
+                fontSize: '20px',
+                fontWeight: 'bold',
+              }} >Joblk </span>
+            </div>
             <div style={{
               display: 'flex',
               alignItems: 'center',
             }}>
-              {showCancel && (
-                <button 
-                  onClick={handleCancel} 
-                  style={{
-                    marginRight: '15px',
-                    backgroundColor: '#e74c3c',
-                    padding: '6px 12px',
-                    borderRadius: '15px',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <span style={{
-                    color: '#fff',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                  }}>Clear</span>
-                </button>
-              )}
+              <button 
+                onClick={handleCancel} 
+                style={{
+                  marginRight: '15px',
+                  backgroundColor: '#e74c3c',
+                  padding: '6px 12px',
+                  borderRadius: '15px',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                <span style={{
+                  color: '#fff',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                }}>Clean</span>
+              </button>
               <button 
                 onClick={toggleChat} 
                 style={{
@@ -266,7 +334,7 @@ const Banner = () => {
                 outline: 'none',
               }}
               value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
+              onChange={(e) => setInputMessage(e.target.value.toLowerCase())}
               placeholder="Type a message..."
               onKeyPress={handleKeyPress}
             />

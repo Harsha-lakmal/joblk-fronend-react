@@ -37,7 +37,6 @@ function CourseCard() {
       setCourses(response.data.content);
       setLoading(false);
 
-      // Fetch images for new courses only
       response.data.content.forEach((course) => {
         if (!courseImages[course.courseId]) {
           getimg(course.courseId);
@@ -76,7 +75,6 @@ function CourseCard() {
         },
       });
 
-      // If there is a change in course data, update the state
       if (JSON.stringify(response.data.content) !== JSON.stringify(courses)) {
         setCourses(response.data.content);
         response.data.content.forEach((course) => {
@@ -90,7 +88,6 @@ function CourseCard() {
     }
   };
 
-  // Cleanup URLs when component unmounts
   useEffect(() => {
     return () => {
       Object.values(courseImages).forEach((url) => URL.revokeObjectURL(url));

@@ -11,7 +11,7 @@ function EmployeesJobsCard() {
 
   useEffect(() => {
     if (token) {
-      getData(); // Fetch jobs if the token exists
+      getData(); 
     } else {
       setError('No authentication token found.');
       setLoading(false);
@@ -21,16 +21,15 @@ function EmployeesJobsCard() {
   useEffect(() => {
     const interval = setInterval(() => {
       if (token) {
-        checkForChanges(); // Use this for periodic checks
+        checkForChanges(); 
       }
     }, 4000);
 
-    // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, [token]);
 
   const getData = () => {
-    setLoading(true); // Set loading true before fetching data
+    setLoading(true); 
     instance
       .get('/job/getAllJobs', {
         headers: {
@@ -63,7 +62,7 @@ function EmployeesJobsCard() {
         const imageUrl = URL.createObjectURL(res.data);
         setCourseImages((prevImages) => ({
           ...prevImages,
-          [jobId]: imageUrl, // Store the image URL in state
+          [jobId]: imageUrl, 
         }));
       })
       .catch((err) => {
@@ -72,7 +71,6 @@ function EmployeesJobsCard() {
   };
 
   const checkForChanges = () => {
-    // Implement logic to check for changes if necessary
     console.log('Checking for changes...');
   };
 
