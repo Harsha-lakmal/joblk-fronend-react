@@ -2,38 +2,35 @@ import { useState } from "react";
 import "./styles.css";
 import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 function UpdateUserCard() {
+  const navigate = useNavigate();
   const [show, setShow] = useState(false);
-  const [fileNames, setFileNames] = useState({
-    imgPathProfile: "",
-    imgPathCover: ""
-  });
-  const [username, SetUsername] = useState("");
-  const [email, SetEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, SetRole] = useState("");
-
+  const [username, setUsername] = useState("update");
+  const [email, setEmail] = useState("update");
+  const [password, setPassword] = useState("update");
+  const [role, setRole] = useState("Employees");
 
   function showSuccessMessage() {
     Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: " Successful",
-        showConfirmButton: false,
-        timer: 2000,
+      position: "top-end",
+      icon: "success",
+      title: "Successful",
+      showConfirmButton: false,
+      timer: 2000,
     });
-}
+  }
 
-function showErrorMessage(message) {
+  function showErrorMessage(message) {
     Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: message,
-        showConfirmButton: false,
-        timer: 2000,
+      position: "top-end",
+      icon: "error",
+      title: message,
+      showConfirmButton: false,
+      timer: 2000,
     });
-}
+  }
 
   const storedUser = localStorage.getItem("userData");
   const parsedUser = storedUser ? JSON.parse(storedUser) : null;
@@ -44,41 +41,43 @@ function showErrorMessage(message) {
   const handleShow = () => setShow(true);
 
   const handleClear = () => {
-    SetUsername("");
-    SetEmail("");
+    setUsername("");
+    setEmail("");
     setPassword("");
-    SetRole("");
+    setRole("");
   };
 
-  const addUser = async () => {
+  const updateUser = async () => {
     try {
       const userData = {
         id: userId,
-        username: username,
-        password: password,
-        email: email,
-        role: role
+        username,
+        password,
+        email,
+        role,
       };
 
-      const userResponse = await instance.put(`/user/updateUser`, userData, {
+      await instance.put(`/user/updateUser`, userData, {
         headers: {
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
       });
 
       showSuccessMessage();
-
+      navigate("/login");
       handleClear();
       handleClose();
     } catch (error) {
       console.error("Error updating user:", error);
-      showErrorMessage();
+      showErrorMessage("Failed to update user");
     }
   };
 
   return (
     <div className="container">
-      <button className="open-modal-btn" onClick={handleShow}>Update Your Account</button>
+      <button className="open-modal-btn" onClick={handleShow}>
+        Update Your Account
+      </button>
       {show && (
         <div className="modal-overlay">
           <div className="modal">
@@ -94,7 +93,7 @@ function showErrorMessage(message) {
                   name="username"
                   placeholder="Username"
                   value={username}
-                  onChange={(e) => SetUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
 
@@ -116,7 +115,7 @@ function showErrorMessage(message) {
                   name="email"
                   placeholder="Email"
                   value={email}
-                  onChange={(e) => SetEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -125,21 +124,19 @@ function showErrorMessage(message) {
                 <select
                   name="role"
                   value={role}
-                  onChange={(e) => SetRole(e.target.value)}
+                  onChange={(e) => setRole(e.target.value)}
                   className="role-dropdown"
                 >
                   <option value="">Select Role</option>
-                  <option value="Admin">Employees</option>
-                  <option value="Employee">Employee</option>
+                  <option value="Employee">Employees</option>
                   <option value="Trainer">Trainer</option>
                 </select>
               </div>
             </div>
-            <br /> <br />
 
             <div className="modal-footer">
               <button className="clear-btn" onClick={handleClear}>Clear</button>
-              <button className="save-btn" onClick={addUser}>Save</button>
+              <button className="save-btn" onClick={updateUser}>Save</button>
               <button className="close-btn" onClick={handleClose}>Close</button>
             </div>
           </div>

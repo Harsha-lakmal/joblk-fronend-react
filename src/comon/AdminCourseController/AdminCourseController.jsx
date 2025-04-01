@@ -39,7 +39,7 @@ function AdminCourseController() {
 
     const getData = () => {
         if (!token) {
-            setError("You are not authorized. Please log in again.");
+            errorMessage("You are not authorized. Please log in again.");
             setLoading(false);
             return;
         }
@@ -58,7 +58,7 @@ function AdminCourseController() {
                 const newToken = await refreshToken();
                 getData(newToken);  
             } else {
-                setError("Failed to load courses.");
+                errorMessage("Failed to load courses.");
                 setLoading(false);  
             }
         });

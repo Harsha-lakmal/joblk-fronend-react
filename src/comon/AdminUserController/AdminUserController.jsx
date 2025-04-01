@@ -58,6 +58,8 @@ function AdminUserController() {
         })
         .catch(error => {
             setError("Failed to load users.");
+            errorMessage("Failed to load users.");
+
             setLoading(false);
         });
     }
@@ -76,6 +78,8 @@ function AdminUserController() {
         })
         .catch(error => {
             setError("Failed to load users.");
+            errorMessage("Failed to load users.");
+
         });
     }
 

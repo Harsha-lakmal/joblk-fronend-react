@@ -36,7 +36,7 @@ function AdminJobsController() {
 
     const getData = () => {
         if (!token) {
-            setError("You are not authorized. Please log in again.");
+            errorMessage("You are not authorized. Please log in again.");
             setLoading(false);
             return;
         }
@@ -55,7 +55,7 @@ function AdminJobsController() {
                 const newToken = await refreshToken();
                 getData(newToken);
             } else {
-                setError("Failed to load jobs.");
+                errorMessage("Failed to load jobs.");
                 setLoading(false);
             }
         });

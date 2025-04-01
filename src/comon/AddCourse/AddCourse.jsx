@@ -52,12 +52,12 @@ function errorMessage(msg) {
 
   const handleSave = async () => {
     if (!courseTitle || !courseDescription || !courseLocation || !courseQualification || !courseContent || !courseStartDate) {
-      alert("All fields must be filled!");
+      errorMessage("All fields must be filled!");
       return;
     }
 
     if (!token) {
-      alert('You are not logged in.');
+      errorMessage('You are not logged in.');
       return;
     }
 

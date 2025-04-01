@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Transition from '../utils/Transition';
 import DefaultAvatar from '../assets/joblk.png';
 import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
+import Swal from 'sweetalert2';
+
 
 function DropdownProfile({ align }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -17,6 +19,27 @@ function DropdownProfile({ align }) {
   const location = useLocation();
   const navigate = useNavigate();
   const storedUser = localStorage.getItem("userData");
+
+
+  function successMessage() {
+          Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "Successful",
+              showConfirmButton: false,
+              timer: 2000,
+          });
+      }
+  
+      function errorMessage(msg) {
+          Swal.fire({
+              position: "top-end",
+              icon: "error",
+              title: msg || "Unsuccessful",
+              showConfirmButton: false,
+              timer: 2000,
+          });
+      }
 
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
@@ -79,7 +102,7 @@ function DropdownProfile({ align }) {
 
     const fileType = file.type.split('/')[0];
     if (fileType !== 'image') {
-      alert("Please upload a valid image file.");
+      errorMessage("Please upload a valid image file.");
       return;
     }
 
@@ -110,14 +133,14 @@ function DropdownProfile({ align }) {
         },
       });
 
-      alert('Profile image updated successfully!');
+      successMessage('Profile image updated successfully!');
       getImgProfile(user.id);
 
       const updatedUser = { ...user, profileImage: response.data.imageUrl };
       localStorage.setItem("userData", JSON.stringify(updatedUser)); 
     } catch (error) {
       console.error('Error uploading profile image:', error);
-      alert('Error updating profile image.');
+      error('Error updating profile image.');
     } finally {
       setUploading(false);
     }
@@ -145,7 +168,6 @@ function DropdownProfile({ align }) {
       }
     } catch (error) {
       console.error('Error fetching user profile image:', error);
-      alert("Could not fetch user profile image. Please try again.");
     }
   }
 

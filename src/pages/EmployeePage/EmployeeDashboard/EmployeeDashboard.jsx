@@ -31,20 +31,18 @@ function EmployeeDashboard() {
 
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-                <Datepicker align="right" />
+           
 
               </div>
 
             </div>
 
             <div className="space-y-8">
-              {/* Courses Section */}
               <section>
                 <h2 className="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-semibold mb-4">Available Courses</h2>
                 <CourseCard />
               </section>
 
-              {/* Jobs Section */}
               <section>
                 <h2 className="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-semibold mb-4">Job Opportunities</h2>
                 <JobCard />

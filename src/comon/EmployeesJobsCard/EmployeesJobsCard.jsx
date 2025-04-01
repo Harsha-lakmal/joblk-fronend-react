@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
 import joblkimg from "../../Assets/joblk.png";
+import Swal from "sweetalert2";
+
 
 function EmployeesJobsCard() {
   const [jobs, setJobs] = useState([]);
@@ -9,11 +11,31 @@ function EmployeesJobsCard() {
   const [courseImages, setCourseImages] = useState({});
   const token = localStorage.getItem('authToken');
 
+    function showSuccessMessage() {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Successful",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+  
+    function showErrorMessage(message) {
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: message,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+
   useEffect(() => {
     if (token) {
       getData(); 
     } else {
-      setError('No authentication token found.');
+      showErrorMessage('No authentication token found.');
       setLoading(false);
     }
   }, [token]);

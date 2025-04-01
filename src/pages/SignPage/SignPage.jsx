@@ -34,7 +34,7 @@ const darkTheme = createTheme({
 });
 
 // Available roles
-const roles = ["Employee", "Trainer", "Employees"];
+const roles = [ "Trainer", "Employees"];
 
 // Success alert
 function showSuccessMessage() {

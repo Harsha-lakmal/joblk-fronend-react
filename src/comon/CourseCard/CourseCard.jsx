@@ -44,6 +44,7 @@ function CourseCard() {
       });
     } catch (error) {
       setError("Failed to load courses.");
+
       setLoading(false);
     }
   };
