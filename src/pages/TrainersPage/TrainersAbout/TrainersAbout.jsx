@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-
 import Header from '../../../partials/Header';
-import FilterButton from '../../../components/DropdownFilter';
-import Datepicker from '../../../components/Datepicker';
 import Banner from '../../../comon/Banner/Banner';
 import TrainersSidebar from '../../../partials/TrainersSidebar'
 import SettingPage from '../../SettingPage/SettingPage'
@@ -29,15 +26,10 @@ function TrainersAbout() {
                 <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{color :"#6495ED"}}> About Page</h1>
               </div>
 
-              <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-               
-                            
+              <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">                 
               </div>
-
             </div>
-
             <div >
-
                 <SettingPage/>
               
             </div>

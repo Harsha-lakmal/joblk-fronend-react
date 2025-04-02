@@ -1,29 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import Datepicker from '../../../components/Datepicker';
 import EmployeesSidebar from '../../../partials/EmployeesSidebar';
 import Banner from '../../../comon/Banner/Banner';
 import Header from '../../../partials/Header';
 import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
 import joblkimg from '../../../Assets/joblk.png';
-import Swal from 'sweetalert2'; // Make sure to import Swal
+import Swal from 'sweetalert2'; 
 
 function EmployeesDashboard() {
-  // State management
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const token = localStorage.getItem('authToken');
   
-  // Jobs state
   const [jobs, setJobs] = useState([]);
   const [jobsImages, setJobsImages] = useState({});
   
-  // Courses state
   const [courses, setCourses] = useState([]);
   const [courseImages, setCourseImages] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // Initial data loading
   useEffect(() => {
     if (!token) {
       setError('No authentication token found.');
@@ -31,11 +26,9 @@ function EmployeesDashboard() {
       return;
     }
 
-    // Load both jobs and courses
     getJobsData();
     getCoursesData();
     
-    // Set up periodic checks for updates
     const jobsInterval = setInterval(() => {
       checkForJobChanges();
     }, 10000);
@@ -44,18 +37,15 @@ function EmployeesDashboard() {
       checkForCourseChanges();
     }, 10000);
     
-    // Clean up intervals on unmount
     return () => {
       clearInterval(jobsInterval);
       clearInterval(coursesInterval);
       
-      // Release object URLs
       Object.values(jobsImages).forEach(url => URL.revokeObjectURL(url));
       Object.values(courseImages).forEach(url => URL.revokeObjectURL(url));
     };
   }, [token]);
 
-  // Jobs related functions
   const getJobsData = () => {
     setLoading(true);
     instance
@@ -76,7 +66,7 @@ function EmployeesDashboard() {
   };
 
   const getJobImage = (jobId) => {
-    if (jobsImages[jobId]) return; // Avoid redundant fetches
+    if (jobsImages[jobId]) return; 
     
     instance
       .get(`/job/get/image/${jobId}`, {
@@ -108,7 +98,6 @@ function EmployeesDashboard() {
       .catch((error) => console.error('Error checking for job updates:', error));
   };
 
-  // Courses related functions
   const getCoursesData = async () => {
     try {
       setLoading(true);
@@ -119,7 +108,6 @@ function EmployeesDashboard() {
       const fetchedCourses = response.data.content;
       setCourses(fetchedCourses);
 
-      // Fetch images for courses
       fetchedCourses.forEach((course) => {
         if (!courseImages[course.courseId]) {
           getCourseImage(course.courseId);
@@ -238,7 +226,6 @@ function EmployeesDashboard() {
 
         <main className="grow">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-            {/* Jobs Section */}
             <div className="mb-16">
               <div className="mb-6">
                 <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{color :"#6495ED"}}>Jobs opportunity</h1>
@@ -271,7 +258,6 @@ function EmployeesDashboard() {
               </div>
             </div>
 
-            {/* Courses Section */}
             <div>
               <div className="mb-6">
                 <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{color :"#6495ED"}} >Course opportunity</h1>

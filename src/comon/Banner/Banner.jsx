@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle } from 'lucide-react';
 
 const Banner = () => {
   const [messages, setMessages] = useState([]);
@@ -176,7 +175,7 @@ const Banner = () => {
           }} 
           onClick={toggleChat}
         >
-          {/* Message Circle Icon */}
+   
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
             width="40" 
@@ -216,7 +215,7 @@ const Banner = () => {
               display: 'flex',
               alignItems: 'center'
             }}>
-              {/* Chat Icon in header */}
+          
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 width="24" 

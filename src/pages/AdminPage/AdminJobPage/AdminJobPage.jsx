@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-
 import Header from '../../../partials/Header';
-import FilterButton from '../../../components/DropdownFilter';
-import Datepicker from '../../../components/Datepicker';
 import Banner from '../../../comon/Banner/Banner';
 import AdminSidebar from '../../../partials/AdminSidebar';
 import AddJob from  '../../../comon/AddJobs/AddJobs'
-import JobCard from '../../../comon/JobCard/JobCard';
 import AdminJobsController from '../../../comon/AdminJobsController/AdminJobsController'
 
 function AdminJobPage() {

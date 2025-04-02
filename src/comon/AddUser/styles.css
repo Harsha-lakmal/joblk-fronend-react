@@ -1,4 +1,3 @@
-/* Container for the button to open the modal */
 .container {
   text-align: center;
   position: relative;
@@ -117,7 +116,7 @@ input:focus, select:focus {
 }
 
 input[type="file"] {
-  display: none; /* Hide the default file input */
+  display: none; 
 }
 
 .file-name {

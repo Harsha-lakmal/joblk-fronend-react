@@ -1,11 +1,6 @@
 import React, { useEffect,useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import '../css/style.css';
-import EmployeeDashboard from '../pages/EmployeePage/EmployeeDashboard/EmployeeDashboard';
-import EmployeeAbout from '../pages/EmployeePage/EmployeeAbout/EmployeeAbout';
-import EmployeeCourse from '../pages/EmployeePage/EmployeeCourse/EmployeeCourse'
-import EmployeeJobPage from '../pages/EmployeePage/EmployeeJobPage/EmployeeJobPage';
-
 import EmployeesAbout from '../pages/EmployeesPage/EmployeesAbout/EmployeesAbout';
 import EmployeesDashboard from '../pages/EmployeesPage/EmployeesDashboard/EmployeesDashboard';
 import EmployeesJobPage from '../pages/EmployeesPage/EmployeesJobPage/EmployeesJobPage';
@@ -22,7 +17,6 @@ import AdminJobPage from '../pages/AdminPage/AdminJobPage/AdminJobPage';
 
 import LoginPage from '../pages/LoginPage/LoginPage';
 import SignPage from '../pages/SignPage/SignPage'
-import SettingPage from '../pages/SettingPage/SettingPage'
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
 function App() {
   const location = useLocation();
@@ -38,10 +32,6 @@ function App() {
       <Route path="/*" element={<LoginPage />} />
       <Route path="/signup" element={<LoginPage />} /> 
       <Route path="/sign" element={<SignPage />} />
-      <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
-      <Route path="/employee/dashboard/about" element={<EmployeeAbout />} />
-      <Route path="/employee/dashboard/course" element={<EmployeeCourse />} />
-      <Route path="/employee/dashboard/job" element={<EmployeeJobPage />} />
       <Route path="/employees/dashboard" element={<EmployeesDashboard />} />
       <Route path="/employees/dashboard/about" element={<EmployeesAbout />} />
       <Route path="/employees/dashboard/course" element={<EmployeesCourse />} />

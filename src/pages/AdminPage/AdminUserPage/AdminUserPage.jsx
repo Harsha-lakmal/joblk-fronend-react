@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
-
 import Header from '../../../partials/Header';
-import Datepicker from '../../../components/Datepicker';
 import Banner from '../../../comon/Banner/Banner';
 import AdminSidebar from '../../../partials/AdminSidebar';
-import FilterButton from '../../../components/DropdownFilter'
 import AddUser from '../../../comon/AddUser/AddUser';
 import AdminUserController from '../../../comon/AdminUserController/AdminUserController';
 
@@ -32,10 +29,7 @@ function AdminUserPage() {
 
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-              <AddUser/>
-
-           
-                            
+              <AddUser/>               
               </div>
 
             </div>

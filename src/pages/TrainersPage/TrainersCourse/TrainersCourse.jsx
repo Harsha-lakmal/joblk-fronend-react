@@ -14,7 +14,6 @@ function TrainersCourse() {
   const token = localStorage.getItem('authToken');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Single useEffect for initial data loading and setting up refresh interval
   useEffect(() => {
     if (!token) {
       setError('No authentication token found.');
@@ -22,19 +21,15 @@ function TrainersCourse() {
       return;
     }
   
-    // Fetch courses on mount
     getData();
     
-    // Set up interval for checking updates
     const interval = setInterval(() => {
       checkForChanges();
     }, 4000);
   
-    // Clean up interval on component unmount
     return () => clearInterval(interval);
   }, [token]);
 
-  // Function to fetch all courses
   const getData = () => {
     setLoading(true);
     instance.get('/course/getAllCourse', {
@@ -46,7 +41,6 @@ function TrainersCourse() {
       setCourses(response.data.content);
       setLoading(false);
 
-      // Fetch image for each course
       response.data.content.forEach(course => {
         getCourseImage(course.courseId);
       });
@@ -57,7 +51,6 @@ function TrainersCourse() {
     });
   };
 
-  // Function to fetch image for each course
   const getCourseImage = (courseId) => {
     instance.get(`course/get/image/${courseId}`, {
       headers: {
@@ -77,16 +70,12 @@ function TrainersCourse() {
     });
   };
 
-  // Function to handle when a new course is added
   const handleCourseAdded = (newCourse) => {
-    // Optimistically update the UI with the new course
     setCourses(prev => [...prev, newCourse]);
     
-    // Fetch the image for the new course
     getCourseImage(newCourse.courseId);
   };
 
-  // Function to check for changes in the database
   const checkForChanges = () => {
     instance
       .get('/course/getAllCourse', { 
@@ -97,7 +86,6 @@ function TrainersCourse() {
       .then((response) => {
         const newCourses = response.data.content;
         
-        // Check if courses have changed by comparing course IDs and length
         const currentIds = courses.map(course => course.courseId).sort().join(',');
         const newIds = newCourses.map(course => course.courseId).sort().join(',');
         
@@ -105,7 +93,6 @@ function TrainersCourse() {
           console.log('Changes detected, updating course list...');
           setCourses(newCourses);
           
-          // Check for new courses that need images
           newCourses.forEach((course) => {
             if (!courseImages[course.courseId]) {
               getCourseImage(course.courseId);

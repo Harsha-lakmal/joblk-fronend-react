@@ -14,7 +14,6 @@ const darkTheme = createTheme({
     },
 });
 
-// Define userGetData instance
 
 
 function successMessage() {
@@ -50,25 +49,19 @@ export default function LoginPage() {
             return;
         }
 
-        // // Validate email format if email is provided
-        // const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        // if (email && !emailPattern.test(email)) {
-        //     errorMessage("Please enter a valid email.");
-        //     return;
-        // }
+     
 
-        // Using then and catch for handling the Promise
         instance.post('/user/login', {
             username: username,
             password: password
         })
             .then((response) => {
                 if (response.data) {
-                    // Token save
+               
                     setAuthToken(response.data);
 
                     successMessage();
-                    fetchUserData();    // Fetch user data after successful login
+                    fetchUserData();    
                 } else {
                     errorMessage(response.data.message || "Login failed!");
                 }
@@ -144,16 +137,8 @@ export default function LoginPage() {
                     <Typography variant="h4" textAlign="center" fontWeight="bold">
                         Login
                     </Typography>
-{/* 
-                    <TextField
-                        label="Email"
-                        variant="outlined"
-                        disabled
-                        fullWidth
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    /> */}
 
+                
                     <TextField
                         label="Username"
                         variant="outlined"

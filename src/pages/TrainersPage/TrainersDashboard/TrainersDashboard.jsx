@@ -36,7 +36,6 @@ function TrainersDashboard() {
     });
   };
 
-  // Single useEffect for initial data loading
   useEffect(() => {
     if (!token) {
       setError("No authentication token found.");
@@ -44,11 +43,9 @@ function TrainersDashboard() {
       return;
     }
 
-    // Initial data fetch
     getJobsData();
     getCoursesData();
     
-    // Set up intervals for checking updates
     const jobsInterval = setInterval(() => {
       getJobsData();
     }, 40000);
@@ -57,14 +54,12 @@ function TrainersDashboard() {
       checkForCourseChanges();
     }, 4000);
 
-    // Clean up intervals on component unmount
     return () => {
       clearInterval(jobsInterval);
       clearInterval(coursesInterval);
     };
   }, [token]);
 
-  // Function to fetch all jobs
   const getJobsData = () => {
     if (!token) return;
     
@@ -87,7 +82,6 @@ function TrainersDashboard() {
       });
   };
 
-  // Function to fetch job image
   const getJobImage = (jobId, newImages = {}) => {
     instance
       .get(`/job/get/image/${jobId}`, {
@@ -103,7 +97,6 @@ function TrainersDashboard() {
       });
   };
 
-  // Function to fetch all courses
   const getCoursesData = () => {
     instance.get('/course/getAllCourse', {
       headers: {
@@ -114,7 +107,6 @@ function TrainersDashboard() {
       setCourses(response.data.content);
       setLoading(false);
 
-      // Fetch image for each course
       response.data.content.forEach(course => {
         getCourseImage(course.courseId);
       });
@@ -126,7 +118,6 @@ function TrainersDashboard() {
     });
   };
 
-  // Function to fetch image for each course
   const getCourseImage = (courseId) => {
     instance.get(`/course/get/image/${courseId}`, {
       headers: {
@@ -146,7 +137,6 @@ function TrainersDashboard() {
     });
   };
 
-  // Function to check for changes in courses
   const checkForCourseChanges = () => {
     instance
       .get('/course/getAllCourse', { 
@@ -157,7 +147,6 @@ function TrainersDashboard() {
       .then((response) => {
         const newCourses = response.data.content;
         
-        // Check if courses have changed by comparing course IDs and length
         const currentIds = courses.map(course => course.courseId).sort().join(',');
         const newIds = newCourses.map(course => course.courseId).sort().join(',');
         
@@ -165,7 +154,6 @@ function TrainersDashboard() {
           console.log('Changes detected, updating course list...');
           setCourses(newCourses);
           
-          // Check for new courses that need images
           newCourses.forEach((course) => {
             if (!courseImages[course.courseId]) {
               getCourseImage(course.courseId);
@@ -176,7 +164,6 @@ function TrainersDashboard() {
       .catch((error) => console.error('Error checking for course updates:', error));
   };
 
-  // Function to handle CV upload
   const cvUploadHandle = async () => {
     try {
       const storedUserData = localStorage.getItem("userData");
@@ -208,12 +195,10 @@ function TrainersDashboard() {
     }
   };
 
-  // Function to handle file change
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       console.log("Selected file:", file);
-      // Implement upload logic here
     }
   };
 
@@ -234,7 +219,6 @@ function TrainersDashboard() {
 
         <main className="grow">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-            {/* Jobs Section */}
             <div className="mb-10">
               <div className="sm:flex sm:justify-between sm:items-center mb-8">
                 <div className="mb-4 sm:mb-0">
@@ -304,7 +288,6 @@ function TrainersDashboard() {
               </div>
             </div>
 
-            {/* Courses Section */}
             <div>
               <div className="sm:flex sm:justify-between sm:items-center mb-8">
                 <div className="mb-4 sm:mb-0">

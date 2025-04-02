@@ -20,7 +20,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-// Dark theme setup
 const darkTheme = createTheme({
     palette: {
         mode: "dark",
@@ -33,10 +32,8 @@ const darkTheme = createTheme({
     },
 });
 
-// Available roles
 const roles = [ "Trainer", "Employees"];
 
-// Success alert
 function showSuccessMessage() {
     Swal.fire({
         position: "top-end",
@@ -47,7 +44,7 @@ function showSuccessMessage() {
     });
 }
 
-// Error alert
+
 function showErrorMessage(message) {
     Swal.fire({
         position: "top-end",
@@ -70,7 +67,7 @@ export default function SignPage() {
     const handleSignUp = async (event) => {
         event.preventDefault();
 
-        // Validation
+      
         if (!email || !userName || !password || !confirmPassword || !role) {
             showErrorMessage("Please fill in all fields.");
             return;

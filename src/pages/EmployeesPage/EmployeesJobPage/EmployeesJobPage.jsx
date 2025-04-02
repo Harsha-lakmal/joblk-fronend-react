@@ -21,9 +21,9 @@ function EmployeesJobPage() {
       return;
     }
 
-    getData(); // Fetch jobs on mount
+    getData(); 
     const interval = setInterval(() => {
-      checkForChangesAlternative(); // Optimized change detection
+      checkForChangesAlternative(); 
     }, 4000);
 
     return () => clearInterval(interval);
@@ -48,7 +48,7 @@ function EmployeesJobPage() {
   };
 
   const getimg = (jobId) => {
-    if (jobsImages[jobId]) return; // Avoid redundant fetches
+    if (jobsImages[jobId]) return; 
     
     instance
       .get(`/job/get/image/${jobId}`, {

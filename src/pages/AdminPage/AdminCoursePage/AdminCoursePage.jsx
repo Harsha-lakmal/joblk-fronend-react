@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-
 import Header from '../../../partials/Header';
 import Banner from '../../../comon/Banner/Banner';
 import AdminSidebar from '../../../partials/AdminSidebar';
 import AddCourse from '../../../comon/AddCourse/AddCourse';
-import CourseCard from '../../../comon/CourseCard/CourseCard';
 import AdminCourseController from '../../../comon/AdminCourseController/AdminCourseController';
 function AdminCoursePage() {
 

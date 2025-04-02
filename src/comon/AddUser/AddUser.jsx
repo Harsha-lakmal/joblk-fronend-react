@@ -1,7 +1,6 @@
 import { useState } from "react";
 import "./styles.css";
 import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx";
-import { tr } from "date-fns/locale/tr";
 import Swal from "sweetalert2";
 
 
