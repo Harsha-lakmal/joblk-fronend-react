@@ -4,6 +4,8 @@ import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx";
 import Swal from 'sweetalert2';
 
 function AddCourse() {
+  const date = new Date();
+  const formattedDate = date.toLocaleDateString("si-LK"); 
   const [show, setShow] = useState(false);
   const [courseTitle, SetCourseTitle] = useState("");
   const [courseDescription, SetCourseDescription] = useState("");
@@ -68,6 +70,8 @@ function errorMessage(msg) {
     formData.append("courseQualification", courseQualification);
     formData.append("courseContent", courseContent);
     formData.append("courseStartDate", courseStartDate);
+    formData.append("dateUpload", formattedDate);
+
 
     try {
       const response = await instance.post(`course/addCourse/${userId}`, formData, {

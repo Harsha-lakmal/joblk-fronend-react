@@ -3,8 +3,9 @@ import joblkimg from "../../../Assets/joblk.png";
 import Header from "../../../partials/Header";
 import Banner from "../../../comon/Banner/Banner";
 import EmployeesSidebar from "../../../partials/EmployeesSidebar";
-import { instance } from "../../../Service/AxiosHolder/AxiosHolder"; 
+import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
 import Swal from "sweetalert2";
+import { CircleUserRound , X } from 'lucide-react';
 
 function EmployeesCourse() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,6 +15,9 @@ function EmployeesCourse() {
   const [error, setError] = useState(null);
   const [courseImages, setCourseImages] = useState({});
   const token = localStorage.getItem("authToken");
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
 
   const showSuccessMessage = () => {
     Swal.fire({
@@ -49,11 +53,11 @@ function EmployeesCourse() {
   const getData = async () => {
     try {
       setLoading(true);
-      const response = await instance.get("/course/getAllCourse", {
+      const response = await instance.get("/course/getAllCourseDetails", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const fetchedCourses = response.data.content;
+      const fetchedCourses = response.data;
       setCourses(fetchedCourses);
 
       fetchedCourses.forEach((course) => {
@@ -96,6 +100,7 @@ function EmployeesCourse() {
 
       const parsedUserData = JSON.parse(storedUserData);
       const userId = parsedUserData.id;
+
       if (!userId || !token) return;
 
       const response = await instance.get(`/user/getCvDocument/${userId}`, {
@@ -119,11 +124,11 @@ function EmployeesCourse() {
 
   const checkForChanges = async () => {
     try {
-      const response = await instance.get("/course/getAllCourse", {
+      const response = await instance.get("/course/getAllCourseDetails", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const newCourses = response.data.content;
+      const newCourses = response.data;
 
       if (JSON.stringify(newCourses) !== JSON.stringify(courses)) {
         setCourses(newCourses);
@@ -135,6 +140,32 @@ function EmployeesCourse() {
       }
     } catch (error) {
       setError("Failed to check for course updates.");
+    }
+  };
+
+  const fetchUserDetails = async (userId) => {
+    try {
+      const response = await instance.get(`/user/getUserId/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      setUserDetails(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      return null;
+    }
+  };
+
+  const handleTallyClick = async (course) => {
+    setSelectedCourse(course);
+    const userData = await fetchUserDetails(course.userId);
+    if (userData) {
+      setShowPopup(true);
+    } else {
+      showErrorMessage("Could not fetch user details");
     }
   };
 
@@ -151,11 +182,51 @@ function EmployeesCourse() {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
+        {/* Compact Popup Window */}
+        {showPopup && selectedCourse && (
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-semibold text-lg">Publisher Details</h3>
+              <button 
+                onClick={() => setShowPopup(false)} 
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center">
+                <span className="font-medium w-20">Name:</span>
+                <span>{userDetails?.username || 'N/A'}</span>
+              </div>
+              <div className="flex items-center">
+                <span className="font-medium w-20">Role:</span>
+                <span>{userDetails?.role || 'N/A'}</span>
+              </div>
+              <div className="flex items-center">
+                <span className="font-medium w-20">Email:</span>
+                <span className="truncate">{userDetails?.email || 'N/A'}</span>
+              </div>
+             
+            </div>
+
+            <div className="mt-4 flex justify-end">
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition"
+                onClick={() => setShowPopup(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+
         <main className="grow">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
             <div className="sm:flex sm:justify-between sm:items-center mb-8">
               <div className="mb-4 sm:mb-0">
-                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{color :"#6495ED"}}>
+                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{ color: "#6495ED" }}>
                   Course opportunity
                 </h1>
               </div>
@@ -169,9 +240,17 @@ function EmployeesCourse() {
                 {courses.map((course) => (
                   <div key={course.courseId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-8 flex flex-col hover:scale-105 transition">
                     <header className="px-5 py-4 border-b border-gray-100 dark:border-gray-700/60">
-                      <h2 className="font-bold text-3xl text-gray-800 dark:text-gray-100">
-                        {course.courseTitle}
-                      </h2>
+                      <div className="flex justify-between items-center">
+                        <h2 className="font-bold text-3xl text-gray-800 dark:text-gray-100">
+                          {course.courseTitle}
+                        </h2>
+                        <button 
+                          onClick={() => handleTallyClick(course)}
+                          className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 transition"
+                        >
+                          <CircleUserRound  size={24} />
+                        </button>
+                      </div>
                     </header>
 
                     <div className="flex flex-col items-center p-4">
@@ -185,7 +264,7 @@ function EmployeesCourse() {
                         <li><span className="font-medium text-lg">Location:</span> {course.courseLocation}</li>
                       </ul>
 
-                      <button onClick={cvUploadHandle} className="mt-6 bg-blue-500 text-white py-3 px-12 rounded-md text-lg">
+                      <button onClick={cvUploadHandle} className="mt-6 bg-blue-500 text-white py-3 px-12 rounded-md text-lg hover:bg-blue-600 transition">
                         Upload CV
                       </button>
                     </div>

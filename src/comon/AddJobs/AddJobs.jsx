@@ -1,15 +1,23 @@
 import { useState } from "react";
-import './styles.css';  
+import './styles.css';
 import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx";
 import Swal from 'sweetalert2';
 
 function AddJobs() {
+  const date = new Date();
+  const formattedDate = date.toLocaleDateString("si-LK"); 
   const [show, setShow] = useState(false);
   const [jobTitle, SetJobTitle] = useState("");
   const [jobDescription, SetJobDescription] = useState("");
   const [qualifications, SetQualifications] = useState("");
   const [jobClosingDate, SetjobClosingDate] = useState("");
-  const [imgPath, SetImgPath] = useState(null); 
+  const [imgPath, SetImgPath] = useState(null);
+
+
+
+
+
+    
 
   const token = localStorage.getItem('authToken');
   const userData = JSON.parse(localStorage.getItem("userData"));
@@ -17,6 +25,7 @@ function AddJobs() {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
 
 
 
@@ -67,12 +76,16 @@ function AddJobs() {
     formData.append("jobDescription", jobDescription);
     formData.append("qualifications", qualifications);
     formData.append("jobClosingDate", jobClosingDate);
+    formData.append("dateUpload", formattedDate);
+
 
     try {
       const response = await instance.post(`job/addJob/${userId}`, formData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
+      console.log(response.data);
+      
       successMessage();
       clear();
       if (imgPath) {
@@ -104,6 +117,7 @@ function AddJobs() {
         }
       });
       clear();
+      
     } catch (error) {
       console.error('Error uploading image:', error);
       if (error.response) {
@@ -145,8 +159,10 @@ function AddJobs() {
               <button className="clear-btn" onClick={clear}>Clear</button>
               <button className="save-btn" onClick={handleSave}>Save</button>
               <button className="close-btn" onClick={handleClose}>Close</button>
+              
             </div>
           </div>
+
         </div>
       )}
     </div>
