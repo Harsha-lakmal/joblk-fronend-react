@@ -18,6 +18,7 @@ import AdminJobPage from '../pages/AdminPage/AdminJobPage/AdminJobPage';
 import LoginPage from '../pages/LoginPage/LoginPage';
 import SignPage from '../pages/SignPage/SignPage'
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
+import ProfilePage from '../pages/ProfilePage/ProfilePage';
 function App() {
   const location = useLocation();
 

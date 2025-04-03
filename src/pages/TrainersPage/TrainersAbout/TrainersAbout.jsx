@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Header from '../../../partials/Header';
 import Banner from '../../../comon/Banner/Banner';
 import TrainersSidebar from '../../../partials/TrainersSidebar'
-import SettingPage from '../../SettingPage/SettingPage'
+import SettingPage from '../../ProfilePage/ProfilePage'
 
 function TrainersAbout() {
 

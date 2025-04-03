@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Header from '../../../partials/Header';
 import Banner from '../../../comon/Banner/Banner';
 import EmployeesSidebar from '../../../partials/EmployeesSidebar';
-import SettingPage from '../../../pages/SettingPage/SettingPage'
+import SettingPage from '../../ProfilePage/ProfilePage'
 
 function EmployeesAbout() {
 
