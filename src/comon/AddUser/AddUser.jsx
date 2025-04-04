@@ -14,6 +14,8 @@ function AddUser() {
   const [email, SetEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, SetRole] = useState("");
+  const date = new Date();
+  const formattedDate = date.toLocaleDateString("si-LK"); 
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -55,7 +57,9 @@ function showErrorMessage(message) {
         username: username , 
         password :password , 
         email : email , 
-        role  : role
+        role  : role , 
+        registerDate: formattedDate
+
       };
 
       const userResponse = await instance.post(`/user/register`, userData);

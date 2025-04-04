@@ -47,13 +47,16 @@ function AdminUserController() {
 
     function getData() {
         setLoading(true);
-        instance.get('/user/getAllUsers', {
+        instance.get('/user/getAllUserDetails', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         })
         .then(response => {
+            console.log(response.data);
+            
             setUsers(response.data);
+            
             setLastFetchedData(response.data);
             setLoading(false);
         })
@@ -189,6 +192,8 @@ function AdminUserController() {
                             <tr>
                                 <th className="py-3 px-6 text-left font-semibold">Username</th>
                                 <th className="py-3 px-6 text-left font-semibold">Email</th>
+                                <th className="py-3 px-6 text-left font-semibold">Register Date  </th>
+
                                 <th className="py-3 px-6 text-left font-semibold">Role</th>
                                 <th className="py-3 px-6 text-left font-semibold">Password</th>
                                 <th className="py-3 px-6 text-left font-semibold">Actions</th>
@@ -202,6 +207,9 @@ function AdminUserController() {
                                     </td>
                                     <td className="py-4 px-6 whitespace-nowrap text-gray-800 dark:text-gray-200">
                                         {user.email}
+                                    </td>
+                                    <td className="py-4 px-6 whitespace-nowrap text-gray-800 dark:text-gray-200">
+                                        {user.registerDate}
                                     </td>
                                     <td className="py-4 px-6 whitespace-nowrap">
                                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -225,6 +233,7 @@ function AdminUserController() {
                                             </button>
                                         </div>
                                     </td>
+                                    
                                     <td className="py-4 px-6 whitespace-nowrap">
                                         <div className="flex space-x-2">
                                             <button

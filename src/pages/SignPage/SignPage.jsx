@@ -1,22 +1,6 @@
 import React, { useState } from "react";
-import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx"; // Adjust path if needed
-
-import {
-    Checkbox,
-    TextField,
-    Button,
-    Typography,
-    createTheme,
-    ThemeProvider,
-    CssBaseline,
-    Box,
-    FormControlLabel,
-    OutlinedInput,
-    InputLabel,
-    MenuItem,
-    FormControl,
-    Select,
-} from "@mui/material";
+import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx"; 
+import {  Checkbox, TextField, Button, Typography, createTheme, ThemeProvider, CssBaseline, Box, FormControlLabel, OutlinedInput,   InputLabel,  MenuItem, FormControl,Select,} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -32,7 +16,7 @@ const darkTheme = createTheme({
     },
 });
 
-const roles = [ "Trainer", "Employees"];
+const roles = ["Trainer", "Employees"];
 
 function showSuccessMessage() {
     Swal.fire({
@@ -43,7 +27,6 @@ function showSuccessMessage() {
         timer: 2000,
     });
 }
-
 
 function showErrorMessage(message) {
     Swal.fire({
@@ -63,22 +46,31 @@ export default function SignPage() {
     const [tandc, setTandc] = useState(false);
     const [role, setRole] = useState("");
     const navigate = useNavigate();
+    const date = new Date();
+    const formattedDate = date.toLocaleDateString("si-LK"); 
 
     const handleSignUp = async (event) => {
         event.preventDefault();
 
-      
+        // Check if all fields are filled
         if (!email || !userName || !password || !confirmPassword || !role) {
             showErrorMessage("Please fill in all fields.");
             return;
         }
 
+        // Check if terms and conditions are accepted
+        if (!tandc) {
+            showErrorMessage("Please accept the Terms & Conditions.");
+            return;
+        }
+
+        // Check if passwords match
         if (password !== confirmPassword) {
             showErrorMessage("Passwords do not match!");
             return;
         }
 
-
+        // Create user data object
         const data = {
             username: userName,
             password: password,
@@ -86,6 +78,7 @@ export default function SignPage() {
             role: role,
             imgPathProfile: "null",
             imgPathCover: "null",
+            registerDate: formattedDate
         };
 
         try {
@@ -144,6 +137,7 @@ export default function SignPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         size="small"
                         required
+                        type="email"
                     />
 
                     <TextField
@@ -178,7 +172,7 @@ export default function SignPage() {
                         required
                     />
 
-                    <FormControl fullWidth size="small">
+                    <FormControl fullWidth size="small" required>
                         <InputLabel>Role</InputLabel>
                         <Select
                             value={role}
@@ -200,9 +194,10 @@ export default function SignPage() {
                                 onChange={(e) => setTandc(e.target.checked)}
                                 color="primary"
                                 sx={{ transform: "scale(0.9)" }}
+                                required
                             />
                         }
-                        label={<Typography variant="body2">I agree with the Terms & Conditions</Typography>}
+                        label={<Typography variant="body2">I agree with the Terms & Conditions </Typography>}
                     />
 
                     <Button
@@ -210,7 +205,14 @@ export default function SignPage() {
                         variant="contained"
                         color="primary"
                         fullWidth
-                        sx={{ padding: "8px", fontSize: "1rem", height: "45px", borderRadius: 1 }}
+                        disabled={!tandc}
+                        sx={{ 
+                            padding: "8px", 
+                            fontSize: "1rem", 
+                            height: "45px", 
+                            borderRadius: 1,
+                            opacity: tandc ? 1 : 0.7
+                        }}
                     >
                         Sign Up
                     </Button>
