@@ -52,25 +52,21 @@ export default function SignPage() {
     const handleSignUp = async (event) => {
         event.preventDefault();
 
-        // Check if all fields are filled
         if (!email || !userName || !password || !confirmPassword || !role) {
             showErrorMessage("Please fill in all fields.");
             return;
         }
 
-        // Check if terms and conditions are accepted
         if (!tandc) {
             showErrorMessage("Please accept the Terms & Conditions.");
             return;
         }
 
-        // Check if passwords match
         if (password !== confirmPassword) {
             showErrorMessage("Passwords do not match!");
             return;
         }
 
-        // Create user data object
         const data = {
             username: userName,
             password: password,
