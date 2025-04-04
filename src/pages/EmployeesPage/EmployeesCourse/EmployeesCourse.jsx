@@ -5,15 +5,15 @@ import Banner from "../../../comon/Banner/Banner";
 import EmployeesSidebar from "../../../partials/EmployeesSidebar";
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
 import Swal from "sweetalert2";
-import { CircleUserRound , X } from 'lucide-react';
+import { CircleUserRound, X } from 'lucide-react';
 
 function EmployeesCourse() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [courses, setCourses] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [courseImages, setCourseImages] = useState({});
+  const [uploadDates, setUploadDates] = useState({});
   const token = localStorage.getItem("authToken");
   const [showPopup, setShowPopup] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -39,16 +39,17 @@ function EmployeesCourse() {
     });
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedFile(file);
-  };
-
   useEffect(() => {
+    if (!token) {
+      setError('No authentication token found.');
+      setLoading(false);
+      return;
+    }
+
     getData();
     const interval = setInterval(checkForChanges, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [token]);
 
   const getData = async () => {
     try {
@@ -62,8 +63,12 @@ function EmployeesCourse() {
 
       fetchedCourses.forEach((course) => {
         if (!courseImages[course.courseId]) {
-          getimg(course.courseId);
+          getCourseImage(course.courseId);
         }
+        setUploadDates(prev => ({
+          ...prev,
+          [course.courseId]: course.dateUpload ? new Date(course.dateUpload).toLocaleDateString() : 'N/A'
+        }));
       });
 
       setLoading(false);
@@ -73,7 +78,7 @@ function EmployeesCourse() {
     }
   };
 
-  const getimg = async (courseId) => {
+  const getCourseImage = async (courseId) => {
     try {
       const res = await instance.get(`/course/get/image/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -129,17 +134,20 @@ function EmployeesCourse() {
       });
 
       const newCourses = response.data;
-
       if (JSON.stringify(newCourses) !== JSON.stringify(courses)) {
         setCourses(newCourses);
         newCourses.forEach((course) => {
           if (!courseImages[course.courseId]) {
-            getimg(course.courseId);
+            getCourseImage(course.courseId);
           }
+          setUploadDates(prev => ({
+            ...prev,
+            [course.courseId]: course.dateUpload ? new Date(course.dateUpload).toLocaleDateString() : 'N/A'
+          }));
         });
       }
     } catch (error) {
-      setError("Failed to check for course updates.");
+      console.error("Failed to check for course updates:", error);
     }
   };
 
@@ -150,8 +158,6 @@ function EmployeesCourse() {
           'Authorization': `Bearer ${token}`,
         },
       });
-
-      setUserDetails(response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching user details:', error);
@@ -163,6 +169,7 @@ function EmployeesCourse() {
     setSelectedCourse(course);
     const userData = await fetchUserDetails(course.userId);
     if (userData) {
+      setUserDetails(userData);
       setShowPopup(true);
     } else {
       showErrorMessage("Could not fetch user details");
@@ -171,7 +178,7 @@ function EmployeesCourse() {
 
   useEffect(() => {
     return () => {
-      Object.values(courseImages).forEach((url) => URL.revokeObjectURL(url));
+      Object.values(courseImages).forEach(url => URL.revokeObjectURL(url));
     };
   }, [courseImages]);
 
@@ -182,7 +189,6 @@ function EmployeesCourse() {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        {/* Compact Popup Window */}
         {showPopup && selectedCourse && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">
             <div className="flex justify-between items-center mb-3">
@@ -208,7 +214,10 @@ function EmployeesCourse() {
                 <span className="font-medium w-20">Email:</span>
                 <span className="truncate">{userDetails?.email || 'N/A'}</span>
               </div>
-             
+              <div className="flex items-center">
+                <span className="font-medium w-20">Upload Date:</span>
+                <span className="truncate">{uploadDates[selectedCourse.courseId] || 'N/A'}</span>
+              </div>
             </div>
 
             <div className="mt-4 flex justify-end">
@@ -227,7 +236,7 @@ function EmployeesCourse() {
             <div className="sm:flex sm:justify-between sm:items-center mb-8">
               <div className="mb-4 sm:mb-0">
                 <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{ color: "#6495ED" }}>
-                  Course opportunity
+                  Course Opportunities
                 </h1>
               </div>
             </div>
@@ -237,39 +246,71 @@ function EmployeesCourse() {
                 {loading && <div className="text-center col-span-full">Loading...</div>}
                 {error && <div className="text-center col-span-full text-red-500">{error}</div>}
 
-                {courses.map((course) => (
-                  <div key={course.courseId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-8 flex flex-col hover:scale-105 transition">
-                    <header className="px-5 py-4 border-b border-gray-100 dark:border-gray-700/60">
-                      <div className="flex justify-between items-center">
-                        <h2 className="font-bold text-3xl text-gray-800 dark:text-gray-100">
-                          {course.courseTitle}
-                        </h2>
+                {courses.length === 0 && !loading ? (
+                  <div className="col-span-full text-center py-4 text-gray-500 dark:text-gray-400">
+                    No courses available at the moment.
+                  </div>
+                ) : (
+                  courses.map((course) => (
+                    <div key={course.courseId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden flex flex-col hover:scale-[1.02] transition-transform duration-300 h-full">
+                      {/* Image Section with Title Overlay */}
+                      <div className="relative h-48 w-full">
+                        <img 
+                          src={courseImages[course.courseId] || joblkimg} 
+                          alt="Course" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                          <h2 className="text-xl font-semibold text-white line-clamp-1">
+                            {course.courseTitle}
+                          </h2>
+                        </div>
                         <button 
                           onClick={() => handleTallyClick(course)}
-                          className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 transition"
+                          className="absolute top-2 right-2 z-10 text-white hover:text-blue-300 transition bg-black/30 p-1 rounded-full"
                         >
-                          <CircleUserRound  size={24} />
+                          <CircleUserRound size={24} />
                         </button>
                       </div>
-                    </header>
 
-                    <div className="flex flex-col items-center p-4">
-                      <img src={courseImages[course.courseId] || joblkimg} alt="Course" className="w-72 h-80 object-cover rounded-lg mb-6" />
+                      {/* Course Details */}
+                      <div className="p-5 flex-grow">
+                        <ul className="space-y-3 text-sm">
+                          <li className="flex items-start">
+                            <span className="font-medium min-w-[100px]">Description:</span>
+                            <span className="flex-1 line-clamp-3">{course.courseDescription}</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="font-medium min-w-[100px]">Content:</span>
+                            <span className="flex-1 line-clamp-3">{course.courseContent}</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="font-medium min-w-[100px]">Qualifications:</span>
+                            <span className="flex-1 line-clamp-3">{course.courseQualification}</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="font-medium min-w-[100px]">Start Date:</span>
+                            <span className="flex-1">{course.courseStartDate}</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="font-medium min-w-[100px]">Location:</span>
+                            <span className="flex-1">{course.courseLocation}</span>
+                          </li>
+                        </ul>
+                      </div>
 
-                      <ul className="space-y-6 text-left w-full">
-                        <li><span className="font-medium text-lg">Description:</span> {course.courseDescription}</li>
-                        <li><span className="font-medium text-lg">Content:</span> {course.courseContent}</li>
-                        <li><span className="font-medium text-lg">Qualifications:</span> {course.courseQualification}</li>
-                        <li><span className="font-medium text-lg">Start Date:</span> {course.courseStartDate}</li>
-                        <li><span className="font-medium text-lg">Location:</span> {course.courseLocation}</li>
-                      </ul>
-
-                      <button onClick={cvUploadHandle} className="mt-6 bg-blue-500 text-white py-3 px-12 rounded-md text-lg hover:bg-blue-600 transition">
-                        Upload CV
-                      </button>
+                      {/* Action Button */}
+                      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                        <button 
+                          onClick={cvUploadHandle} 
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition"
+                        >
+                          Apply Now
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>

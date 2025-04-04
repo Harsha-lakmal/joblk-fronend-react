@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx";
 import Swal from 'sweetalert2';
+import { CircleUserRound, X, Edit, Trash2 } from 'lucide-react';
 
 function AdminJobsController() {
     const [jobs, setJobs] = useState([]);
@@ -12,6 +13,10 @@ function AdminJobsController() {
     const [jobDescription, setJobDescription] = useState('');
     const [jobQualifications, setJobQualifications] = useState('');
     const [jobClosingDate, setJobClosingDate] = useState('');
+    const [uploadDates, setUploadDates] = useState({});
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedJob, setSelectedJob] = useState(null);
+    const [userDetails, setUserDetails] = useState(null);
     const token = localStorage.getItem('authToken');
 
     function successMessage() {
@@ -34,55 +39,96 @@ function AdminJobsController() {
         });
     }
 
-    const getData = () => {
-        if (!token) {
+    // Function to refresh token
+    const refreshToken = async () => {
+        try {
+            const refreshResponse = await instance.post('/auth/refresh', {
+                refreshToken: localStorage.getItem('refreshToken')
+            });
+            const newToken = refreshResponse.data.token;
+            localStorage.setItem('authToken', newToken);
+            return newToken;
+        } catch (error) {
+            errorMessage("Session expired. Please login again.");
+            // Redirect to login page or handle as needed
+            return null;
+        }
+    };
+
+    const getData = async (currentToken = token) => {
+        if (!currentToken) {
             errorMessage("You are not authorized. Please log in again.");
             setLoading(false);
             return;
         }
 
-        instance.get('/job/getAllJobs', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        .then(response => {
-            setJobs(response.data.content);
+        try {
+            const response = await instance.get('/job/getAllJobsDetails', {
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`
+                }
+            });
+            
+            setJobs(response.data);
+            const dateUpdates = {};
+            response.data.forEach(job => {
+                dateUpdates[job.jobId] = job.dateUpload ? new Date(job.dateUpload).toLocaleDateString() : 'N/A';
+            });
+            setUploadDates(dateUpdates);
             setLoading(false);
-        })
-        .catch(async (error) => {
+        } catch (error) {
             if (error.response && error.response.status === 403) {
                 const newToken = await refreshToken();
-                getData(newToken);
+                if (newToken) {
+                    getData(newToken);
+                } else {
+                    setLoading(false);
+                }
             } else {
+                setError("Failed to load jobs. Please try again later.");
                 errorMessage("Failed to load jobs.");
                 setLoading(false);
             }
-        });
+        }
     };
 
     useEffect(() => {
-        getData(); 
-
-        const refreshInterval = setInterval(() => {
-            getData();
-        }, 50); 
-
-        return () => clearInterval(refreshInterval); 
+        getData();
+        const refreshInterval = setInterval(getData, 10000);
+        return () => clearInterval(refreshInterval);
     }, []);
 
     const handleDelete = (id) => {
-        instance.delete(`/job/deleteJob/${id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                instance.delete(`/job/deleteJob/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                    .then(() => {
+                        setJobs(jobs.filter(job => job.jobId !== id));
+                        successMessage();
+                    })
+                    .catch(async (err) => {
+                        if (err.response && err.response.status === 403) {
+                            const newToken = await refreshToken();
+                            if (newToken) {
+                                handleDelete(id);
+                            }
+                        } else {
+                            errorMessage("Failed to delete job.");
+                        }
+                    });
             }
-        })
-        .then(() => {
-            setJobs(jobs.filter(job => job.jobId !== id));
-            successMessage();
-        })
-        .catch(err => {
-            errorMessage();
         });
     };
 
@@ -91,152 +137,299 @@ function AdminJobsController() {
         setJobTitle(job.jobTitle);
         setJobDescription(job.jobDescription);
         setJobQualifications(job.qualifications);
-        setJobClosingDate(job.jobClosingDate);
+        // Ensure date is formatted correctly
+        const dateValue = job.jobClosingDate ? job.jobClosingDate.split('T')[0] : '';
+        setJobClosingDate(dateValue);
         setModalOpen(true);
     };
 
-    const handleSubmitUpdate = (e) => {
+    const handleSubmitUpdate = async (e) => {
         e.preventDefault();
 
-        const updatedJob = { 
-            jobId: jobToUpdate.jobId,  
+        const updatedJob = {
+            jobId: jobToUpdate.jobId,
             jobTitle,
             jobDescription,
             qualifications: jobQualifications,
             jobClosingDate
         };
 
-        instance.put(`/job/updateJob`, updatedJob, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        .then(response => {
-            const updatedJobs = jobs.map(job => 
+        try {
+            const response = await instance.put(`/job/updateJob`, updatedJob, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            const updatedJobs = jobs.map(job =>
                 job.jobId === jobToUpdate.jobId ? { ...job, ...response.data } : job
             );
             setJobs(updatedJobs);
             setModalOpen(false);
             successMessage();
-        })
-        .catch(err => {
-            errorMessage("Failed to update job.");
-        });
+        } catch (err) {
+            if (err.response && err.response.status === 403) {
+                const newToken = await refreshToken();
+                if (newToken) {
+                    // Try again with new token
+                    try {
+                        const response = await instance.put(`/job/updateJob`, updatedJob, {
+                            headers: {
+                                'Authorization': `Bearer ${newToken}`
+                            }
+                        });
+                        
+                        const updatedJobs = jobs.map(job =>
+                            job.jobId === jobToUpdate.jobId ? { ...job, ...response.data } : job
+                        );
+                        setJobs(updatedJobs);
+                        setModalOpen(false);
+                        successMessage();
+                    } catch (error) {
+                        errorMessage("Failed to update job.");
+                    }
+                }
+            } else {
+                errorMessage("Failed to update job.");
+            }
+        }
+    };
+
+    const fetchUserDetails = async (userId) => {
+        try {
+            const response = await instance.get(`/user/getUserId/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            if (error.response && error.response.status === 403) {
+                const newToken = await refreshToken();
+                if (newToken) {
+                    try {
+                        const response = await instance.get(`/user/getUserId/${userId}`, {
+                            headers: {
+                                'Authorization': `Bearer ${newToken}`,
+                            },
+                        });
+                        return response.data;
+                    } catch (err) {
+                        console.error('Error fetching user details:', err);
+                        errorMessage("Failed to fetch user details.");
+                        return null;
+                    }
+                }
+            } else {
+                console.error('Error fetching user details:', error);
+                errorMessage("Failed to fetch user details.");
+                return null;
+            }
+        }
+    };
+
+    const handleTallyClick = async (job) => {
+        setSelectedJob(job);
+        const userData = await fetchUserDetails(job.userId);
+        if (userData) {
+            setUserDetails(userData);
+            setShowPopup(true);
+        } else {
+            errorMessage("Could not fetch user details");
+        }
     };
 
     return (
-        <div className="overflow-x-auto">
-            {loading && <div className="text-center">Loading...</div>}
-            {error && <div className="text-center text-red-500">{error}</div>}
-{/* 
-            <div className="flex justify-between items-center mb-4">
-                <button
-                    onClick={getData}
-                    className="bg-blue-500 text-white py-1 px-4 rounded"
-                >
-                    Refresh
-                </button>
-            </div>  */}
+        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-8">
+            <div className="max-w-7xl mx-auto">
+                {loading && (
+                    <div className="flex justify-center items-center py-8">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    </div>
+                )}
 
-            <table className="min-w-full table-auto border-collapse text-sm">
-                <thead>
-                    <tr className="bg-gray-200">
-                        <th className="py-1 px-2 text-left">Job Title</th>
-                        <th className="py-1 px-2 text-left">Description</th>
-                        <th className="py-1 px-2 text-left">Qualifications</th>
-                        <th className="py-1 px-2 text-left">Closing Date</th>
-                        <th className="py-1 px-2 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {jobs.map((job) => (
-                        <tr key={job.jobId} className="border-b">
-                            <td className="py-1 px-2">{job.jobTitle}</td>
-                            <td className="py-1 px-2">{job.jobDescription}</td>
-                            <td className="py-1 px-2">{job.qualifications}</td>
-                            <td className="py-1 px-2">{job.jobClosingDate}</td>
-                            <td className="py-1 px-2">
-                                <button
-                                    onClick={() => handleUpdate(job)}
-                                    className="bg-yellow-500 text-white py-1 px-2 rounded mr-2 text-xs"
-                                >
-                                    Update
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(job.jobId)}
-                                    className="bg-red-500 text-white py-1 px-2 rounded text-xs"
-                                >
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                {error && (
+                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                        <p>{error}</p>
+                    </div>
+                )}
 
-            {modalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg w-72">
-                        <h2 className="text-2xl font-bold mb-4">Update Job</h2>
+                {showPopup && selectedJob && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-semibold text-gray-800">Publisher Details</h3>
+                                <button
+                                    onClick={() => setShowPopup(false)}
+                                    className="text-gray-500 hover:text-gray-700 transition"
+                                >
+                                    <X size={24} />
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex items-center">
+                                    <span className="font-medium text-gray-700 w-32">Name:</span>
+                                    <span className="text-gray-600">{userDetails?.username || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="font-medium text-gray-700 w-32">Role:</span>
+                                    <span className="text-gray-600">{userDetails?.role || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="font-medium text-gray-700 w-32">Email:</span>
+                                    <span className="text-gray-600 truncate">{userDetails?.email || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="font-medium text-gray-700 w-32">Upload Date:</span>
+                                    <span className="text-gray-600">{uploadDates[selectedJob.jobId] || 'N/A'}</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 flex justify-end">
+                                <button
+                                    className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition"
+                                    onClick={() => setShowPopup(false)}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {!loading && jobs.length > 0 && (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-100 dark:bg-gray-700">
+                                <tr>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Publisher</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job Title</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qualifications</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Closing Date</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+                                {jobs.map((job) => (
+                                    <tr key={job.jobId} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td className="px-4 py-4 whitespace-nowrap w-16">
+                                            <div className="flex items-center justify-center">
+                                                <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-blue-100 rounded-full">
+                                                    <CircleUserRound
+                                                        className="h-6 w-6 text-blue-600 cursor-pointer"
+                                                        onClick={() => handleTallyClick(job)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-normal max-w-xs">
+                                            <div className="text-sm font-medium text-gray-900 dark:text-gray-300 line-clamp-2">{job.jobTitle}</div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-normal max-w-xs">
+                                            <div className="text-sm text-gray-900 dark:text-gray-300 line-clamp-2">{job.jobDescription}</div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-normal max-w-xs">
+                                            <div className="text-sm text-gray-900 dark:text-gray-300 line-clamp-2">{job.qualifications}</div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-900 dark:text-gray-300">
+                                                {job.jobClosingDate ? new Date(job.jobClosingDate).toLocaleDateString() : 'N/A'}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button
+                                                onClick={() => handleUpdate(job)}
+                                                className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4"
+                                                title="Edit"
+                                            >
+                                                <Edit className="h-5 w-5" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(job.jobId)}
+                                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                                title="Delete"
+                                            >
+                                                <Trash2 className="h-5 w-5" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {!loading && jobs.length === 0 && (
+                    <div className="text-center py-8">
+                        <div className="text-gray-500 dark:text-gray-400">No jobs available at the moment.</div>
+                    </div>
+                )}
+            </div>
+
+            {modalOpen && jobToUpdate && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Update Job</h2>
                         <form onSubmit={handleSubmitUpdate}>
                             <div className="mb-4">
-                                <label htmlFor="jobTitle" className="block text-sm font-medium">Job Title</label>
-                                <input 
-                                    type="text" 
-                                    id="jobTitle" 
-                                    value={jobTitle} 
-                                    onChange={(e) => setJobTitle(e.target.value)} 
-                                    className="w-full p-2 border rounded"
-                                    required 
+                                <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job Title</label>
+                                <input
+                                    type="text"
+                                    id="jobTitle"
+                                    value={jobTitle}
+                                    onChange={(e) => setJobTitle(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                    required
                                 />
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="jobDescription" className="block text-sm font-medium">Job Description</label>
-                                <input 
-                                    type="text" 
-                                    id="jobDescription" 
-                                    value={jobDescription} 
-                                    onChange={(e) => setJobDescription(e.target.value)} 
-                                    className="w-full p-2 border rounded"
-                                    required 
+                                <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job Description</label>
+                                <textarea
+                                    id="jobDescription"
+                                    value={jobDescription}
+                                    onChange={(e) => setJobDescription(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                    rows="3"
+                                    required
                                 />
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="jobQualifications" className="block text-sm font-medium">Job Qualifications</label>
-                                <input 
-                                    type="text" 
-                                    id="jobQualifications" 
-                                    value={jobQualifications} 
-                                    onChange={(e) => setJobQualifications(e.target.value)} 
-                                    className="w-full p-2 border rounded"
-                                    required 
+                                <label htmlFor="jobQualifications" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Qualifications</label>
+                                <textarea
+                                    id="jobQualifications"
+                                    value={jobQualifications}
+                                    onChange={(e) => setJobQualifications(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                    rows="3"
+                                    required
                                 />
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="jobClosingDate" className="block text-sm font-medium">Job Closing Date</label>
-                                <input 
-                                    type="date" 
-                                    id="jobClosingDate" 
-                                    value={jobClosingDate} 
-                                    onChange={(e) => setJobClosingDate(e.target.value)} 
-                                    className="w-full p-2 border rounded"
-                                    required 
+                                <label htmlFor="jobClosingDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Closing Date</label>
+                                <input
+                                    type="date"
+                                    id="jobClosingDate"
+                                    value={jobClosingDate}
+                                    onChange={(e) => setJobClosingDate(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                    required
                                 />
                             </div>
-                           
-                            <div className="flex justify-end">
-                                <button 
-                                    type="button" 
-                                    onClick={() => setModalOpen(false)} 
-                                    className="mr-2 bg-gray-500 text-white py-1 px-4 rounded"
+                            <div className="flex justify-end space-x-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setModalOpen(false)}
+                                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 >
                                     Cancel
                                 </button>
-                                <button 
-                                    type="submit" 
-                                    className="bg-blue-500 text-white py-1 px-4 rounded"
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 >
-                                    Update
+                                    Update Job
                                 </button>
                             </div>
                         </form>
