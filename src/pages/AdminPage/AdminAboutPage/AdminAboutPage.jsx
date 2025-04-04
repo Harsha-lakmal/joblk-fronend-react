@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import Header from '../../../partials/Header';
 import Banner from '../../../comon/Banner/Banner';
-import EmployeesSidebar from '../../../partials/EmployeesSidebar';
-import SettingPage from '../../ProfilePage/ProfilePage'
+import AdminSidebar from '../../../partials/AdminSidebar';
+ import ProfilePage from '../../ProfilePage/ProfilePage';
+ import AddJobs from '../../../comon/AddJobs/AddJobs';
 
-function EmployeesAbout() {
+function AdminAboutPage() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden">
 
-      <EmployeesSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
 
@@ -23,19 +24,19 @@ function EmployeesAbout() {
             <div className="sm:flex sm:justify-between sm:items-center mb-8">
 
               <div className="mb-4 sm:mb-0">
-                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold"style={{color :"#6495ED"}}  > Profile Page </h1>
+                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{color :"#6495ED"}} > Profile Page  </h1>
               </div>
 
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+                  <AddJobs/>
                             
               </div>
 
             </div>
 
-            <div>
-                
-                <SettingPage/>
-              
+            <div >
+
+              <ProfilePage/>              
             </div>
 
           </div>
@@ -48,4 +49,4 @@ function EmployeesAbout() {
   );
 }
 
-export default EmployeesAbout;
+export default AdminAboutPage;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { instance } from '../../Service/AxiosHolder/AxiosHolder';
 import Swal from 'sweetalert2';
-import { Edit, Trash2, X, Plus, CircleUserRound, KeyRound, RefreshCw, Loader2 } from 'lucide-react';
+import { Edit, Trash2, X, KeyRound, RefreshCw, Loader2 } from 'lucide-react';
 
 function AdminUserController() {
     const [users, setUsers] = useState([]);
@@ -125,7 +125,7 @@ function AdminUserController() {
             id: userToUpdate.id,  
             username,
             email,
-            password: password || undefined, // Only send password if it's changed
+            password: password || undefined, 
             role 
         };
 
@@ -171,11 +171,9 @@ function AdminUserController() {
         });
     };
 
-
     return (
-        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-8 mx-4 my-6">
-       
-            
+        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 mx-4 my-6">
+         
             {loading ? (
                 <div className="flex justify-center items-center py-16">
                     <Loader2 className="animate-spin text-blue-500" size={40} />
@@ -185,24 +183,28 @@ function AdminUserController() {
                     <p>{error}</p>
                 </div>
             ) : (
-                <div className="overflow-x-auto rounded-xl shadow-lg">
-                    <table className="min-w-full bg-white dark:bg-gray-700">
-                        <thead className="bg-gray-800 dark:bg-gray-900 text-white">
+                <div >
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-100 dark:bg-gray-700">
                             <tr>
-                                <th className="py-4 px-6 text-left font-semibold text-lg">Username</th>
-                                <th className="py-4 px-6 text-left font-semibold text-lg">Email</th>
-                                <th className="py-4 px-6 text-left font-semibold text-lg">Role</th>
-                                <th className="py-4 px-6 text-left font-semibold text-lg">Password</th>
-                                <th className="py-4 px-6 text-left font-semibold text-lg">Actions</th>
+                                <th className="py-3 px-6 text-left font-semibold">Username</th>
+                                <th className="py-3 px-6 text-left font-semibold">Email</th>
+                                <th className="py-3 px-6 text-left font-semibold">Role</th>
+                                <th className="py-3 px-6 text-left font-semibold">Password</th>
+                                <th className="py-3 px-6 text-left font-semibold">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="text-gray-700 dark:text-gray-300">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {users.map((user) => (
-                                <tr key={user.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
-                                    <td className="py-4 px-6 text-lg">{user.username}</td>
-                                    <td className="py-4 px-6 text-lg">{user.email}</td>
-                                    <td className="py-4 px-6">
-                                        <span className={`px-4 py-2 rounded-full text-sm font-medium ${
+                                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <td className="py-4 px-6 whitespace-nowrap text-gray-800 dark:text-gray-200">
+                                        {user.username}
+                                    </td>
+                                    <td className="py-4 px-6 whitespace-nowrap text-gray-800 dark:text-gray-200">
+                                        {user.email}
+                                    </td>
+                                    <td className="py-4 px-6 whitespace-nowrap">
+                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                                             user.role === 'Admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
                                             user.role === 'Trainer' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
                                             'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
@@ -210,34 +212,34 @@ function AdminUserController() {
                                             {user.role}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-6">
+                                    <td className="py-4 px-6 whitespace-nowrap">
                                         <div className="flex items-center">
-                                            <KeyRound className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
-                                            <span className="text-gray-500 dark:text-gray-400 mr-3 text-lg">••••••</span>
+                                            <KeyRound className="text-gray-500 dark:text-gray-400 mr-2" size={18} />
+                                            <span className="text-gray-500 dark:text-gray-400 mr-3">••••••</span>
                                             <button
                                                 onClick={() => handleResetPassword(user.id)}
-                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-lg font-medium flex items-center"
+                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium flex items-center"
                                             >
-                                                <RefreshCw className="mr-2" size={18} />
+                                                <RefreshCw className="mr-1" size={16} />
                                                 Reset
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex space-x-4">
+                                    <td className="py-4 px-6 whitespace-nowrap">
+                                        <div className="flex space-x-2">
                                             <button
                                                 onClick={() => handleUpdate(user)}
-                                                className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg text-lg font-medium transition-colors flex items-center"
+                                                className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded text-sm font-medium transition-colors flex items-center"
                                             >
-                                                <Edit className="mr-2" size={18} />
-                                      
+                                                <Edit className="mr-1" size={16} />
+                                                
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(user.id)}
-                                                className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg text-lg font-medium transition-colors flex items-center"
+                                                className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm font-medium transition-colors flex items-center"
                                             >
-                                                <Trash2 className="mr-2" size={18} />
-                                        
+                                                <Trash2 className="mr-1" size={16} />
+                                                
                                             </button>
                                         </div>
                                     </td>
@@ -248,26 +250,25 @@ function AdminUserController() {
                 </div>
             )}
 
-            {/* Keep the modal code exactly the same as before */}
             {modalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl"> {/* Increased max-width */}
-                        <div className="p-8"> {/* Increased padding */}
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
-                                    <Edit className="mr-3" size={24} />
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
+                                    <Edit className="mr-2" size={20} />
                                     {userToUpdate ? 'Update User' : 'Create User'}
                                 </h2>
                                 <button 
                                     onClick={() => setModalOpen(false)} 
                                     className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                                 >
-                                    <X size={24} />
+                                    <X size={20} />
                                 </button>
                             </div>
                             <form onSubmit={handleSubmitUpdate}>
-                                <div className="mb-6"> {/* Increased margin-bottom */}
-                                    <label htmlFor="username" className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <div className="mb-4">
+                                    <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         Username
                                     </label>
                                     <input 
@@ -275,12 +276,12 @@ function AdminUserController() {
                                         id="username" 
                                         value={username} 
                                         onChange={(e) => setUsername(e.target.value)} 
-                                        className="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                         required 
                                     />
                                 </div>
-                                <div className="mb-6">
-                                    <label htmlFor="email" className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <div className="mb-4">
+                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         Email
                                     </label>
                                     <input 
@@ -288,12 +289,12 @@ function AdminUserController() {
                                         id="email" 
                                         value={email} 
                                         onChange={(e) => setEmail(e.target.value)} 
-                                        className="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                         required 
                                     />
                                 </div>
-                                <div className="mb-6">
-                                    <label htmlFor="password" className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <div className="mb-4">
+                                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         Password
                                     </label>
                                     <div className="relative">
@@ -302,21 +303,21 @@ function AdminUserController() {
                                             id="password" 
                                             value={password} 
                                             onChange={(e) => setPassword(e.target.value)} 
-                                            className="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                             placeholder="Leave blank to keep current"
                                         />
-                                        <KeyRound className="absolute right-4 top-3.5 text-gray-400 dark:text-gray-500" size={22} />
+                                        <KeyRound className="absolute right-3 top-2.5 text-gray-400 dark:text-gray-500" size={18} />
                                     </div>
                                 </div>
-                                <div className="mb-8">
-                                    <label htmlFor="role" className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <div className="mb-6">
+                                    <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         Role
                                     </label>
                                     <select 
                                         id="role" 
                                         value={role} 
                                         onChange={(e) => setRole(e.target.value)} 
-                                        className="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                         required
                                     >
                                         <option value="Admin">Admin</option>
@@ -324,21 +325,21 @@ function AdminUserController() {
                                         <option value="Trainer">Trainer</option>
                                     </select>
                                 </div>
-                                <div className="flex justify-end space-x-4">
+                                <div className="flex justify-end space-x-3">
                                     <button 
                                         type="button" 
                                         onClick={() => setModalOpen(false)} 
-                                        className="px-6 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center"
+                                        className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center"
                                     >
-                                        <X className="mr-2" size={20} />
+                                        <X className="mr-1" size={16} />
                                         Cancel
                                     </button>
                                     <button 
                                         type="submit" 
-                                        className="px-6 py-3 text-lg bg-blue-600 border border-transparent rounded-lg font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center"
+                                        className="px-4 py-2 text-sm bg-blue-600 border border-transparent rounded-lg font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center"
                                     >
-                                        <Edit className="mr-2" size={20} />
-                                        Update User
+                                        <Edit className="mr-1" size={16} />
+                                        Update
                                     </button>
                                 </div>
                             </form>

@@ -14,11 +14,13 @@ import TrainersCourse from '../pages/TrainersPage/TrainersCourse/TrainersCourse'
 import AdminUserPage from '../pages/AdminPage/AdminUserPage/AdminUserPage';
 import AdminCoursePage from '../pages/AdminPage/AdminCoursePage/AdminCoursePage';
 import AdminJobPage from '../pages/AdminPage/AdminJobPage/AdminJobPage';
+import AdminAboutPage from '../pages/AdminPage/AdminAboutPage/AdminAboutPage';
 
 import LoginPage from '../pages/LoginPage/LoginPage';
 import SignPage from '../pages/SignPage/SignPage'
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
 import ProfilePage from '../pages/ProfilePage/ProfilePage';
+
 function App() {
   const location = useLocation();
 
@@ -43,7 +45,9 @@ function App() {
       <Route path="/trainers/dashboard/job" element={<TrainersJobPage />} />
       <Route path="/admin/dashboard" element={<AdminUserPage />} />
       <Route path="/admin/dashboard/job" element={<AdminJobPage />} />
-      <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />    
+      <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />  
+      <Route path="/admin/dashboard/about" element={<AdminAboutPage />} />    
+  
       <Route path="/error" element={<NotFoundPage />} />    
     </Routes>
    

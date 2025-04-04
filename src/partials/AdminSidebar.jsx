@@ -137,6 +137,10 @@ function AdminSidebar({
               </SidebarLinkGroup>
 
 
+
+              
+
+
               <SidebarLinkGroup activecondition={pathname === "/admin/dashboard/course" || pathname.includes("AdminCoursePage")}>
                 {(handleClick, open) => {
                   return (
@@ -228,10 +232,55 @@ function AdminSidebar({
                 }}
               </SidebarLinkGroup>
 
-              
+{/* 
 
-            
-           
+              <SidebarLinkGroup activecondition={pathname === "/admin/dashboard/about" || pathname.includes("AdimnAboutPage")}>
+                              {(handleClick, open) => {
+                                return (
+                                  <React.Fragment>
+                                    <a
+                                      href="#0"
+                                      className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname === "/admin/dashboard/about" || pathname.includes("EmployeeAbout") ? "" : "hover:text-gray-900 dark:hover:text-white"
+                                        }`}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleClick();
+                                        setSidebarExpanded(true);
+                                      }}
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <div className="flex items-center">
+                                        <img src={aboutImg} alt="home-icon" width={'20px'} height={'20px'} />
+              
+                                          <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                                          <li className="mb-1 last:mb-0">
+                                          <NavLink
+                                            end
+                                            to="/admin/dashboard/about"
+                                            className={({ isActive }) =>
+                                              "block transition duration-150 truncate " + (isActive ? "text-violet-500" : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
+                                            }
+                                          >
+                                            About Page
+                                          </NavLink>
+                                        </li>
+                                          </span>
+                                        </div>
+                  
+                                      </div>
+                                    </a>
+                                    <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
+                                      <ul className={`pl-8 mt-1 ${!open && "hidden"}`}>
+                                       
+                                      </ul>
+                                    </div>
+                                  </React.Fragment>
+                                );
+                              }}
+                            </SidebarLinkGroup> */}
+
+
+
             </ul>
           </div>
         
