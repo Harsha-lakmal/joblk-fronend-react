@@ -1,98 +1,214 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Transition from '../utils/Transition';
 
-function DropdownNotifications({
-  align
-}) {
+function NotificationIcon({ unread }) {
+  return (
+    <div className="relative">
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z"
+          fill="currentColor"
+          className="text-gray-500 dark:text-gray-400"
+        />
+      </svg>
+      {unread > 0 && (
+        <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-gray-800"></div>
+      )}
+    </div>
+  );
+}
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const trigger = useRef(null);
-  const dropdown = useRef(null);
-
-  // close on click outside
-  useEffect(() => {
-    const clickHandler = ({ target }) => {
-      if (!dropdown.current) return;
-      if (!dropdownOpen || dropdown.current.contains(target) || trigger.current.contains(target)) return;
-      setDropdownOpen(false);
-    };
-    document.addEventListener('click', clickHandler);
-    return () => document.removeEventListener('click', clickHandler);
-  });
-
-  // close if the esc key is pressed
-  useEffect(() => {
-    const keyHandler = ({ keyCode }) => {
-      if (!dropdownOpen || keyCode !== 27) return;
-      setDropdownOpen(false);
-    };
-    document.addEventListener('keydown', keyHandler);
-    return () => document.removeEventListener('keydown', keyHandler);
-  });
+function NotificationItem({ notification, onDismiss }) {
+  const { id, title, message, time, read, type } = notification;
+  
+  const typeColors = {
+    info: 'text-blue-500 bg-blue-100 dark:bg-blue-900/30',
+    success: 'text-green-500 bg-green-100 dark:bg-green-900/30',
+    warning: 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30',
+    error: 'text-red-500 bg-red-100 dark:bg-red-900/30',
+  };
 
   return (
-    <div className="relative inline-flex">
+    <div key={id} className={`px-3 py-2 rounded-lg mb-1 ${!read ? 'bg-violet-50 dark:bg-gray-700/50' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+      <div className="flex items-start justify-between">
+        <div className="flex items-start">
+          <div className={`rounded-full p-1.5 mr-2 ${typeColors[type] || typeColors.info}`}>
+            {type === 'info' && (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
+            {type === 'success' && (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+            {type === 'warning' && (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            )}
+            {type === 'error' && (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            )}
+          </div>
+          <div>
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{title}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">{message}</div>
+            <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{time}</div>
+          </div>
+        </div>
+        <button 
+          onClick={() => onDismiss(id)}
+          className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function DropdownNotifications({ align = 'right' }) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: 'New message',
+      message: 'You have received a new message from Sarah',
+      time: '2 min ago',
+      read: false,
+      type: 'info'
+    },
+    {
+      id: 2,
+      title: 'New user',
+      message: 'A new user has registered',
+      time: '1 hour ago',
+      read: false,
+      type: 'success'
+    },
+    {
+      id: 3,
+      title: 'System alert',
+      message: 'Scheduled maintenance tomorrow at 3AM',
+      time: '5 hours ago',
+      read: true,
+      type: 'warning'
+    },
+    {
+      id: 4,
+      title: 'Payment received',
+      message: 'Your payment of $120 has been processed',
+      time: '1 day ago',
+      read: true,
+      type: 'success'
+    }
+  ]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const dismissNotification = (id) => {
+    setNotifications(notifications.map(n => 
+      n.id === id ? { ...n, read: true } : n
+    ));
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownOpen && !event.target.closest('#notifications-dropdown') && !event.target.closest('#notifications-button')) {
+        setDropdownOpen(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [dropdownOpen]);
+
+  return (
+    <div className="relative">
       <button
-        ref={trigger}
+        id="notifications-button"
         className={`w-8 h-8 flex items-center justify-center hover:bg-gray-100 lg:hover:bg-gray-200 dark:hover:bg-gray-700/50 dark:lg:hover:bg-gray-800 rounded-full ${dropdownOpen && 'bg-gray-200 dark:bg-gray-800'}`}
-        aria-haspopup="true"
-        onClick={() => setDropdownOpen(!dropdownOpen)}
+        onClick={(e) => { e.stopPropagation(); setDropdownOpen(!dropdownOpen); }}
         aria-expanded={dropdownOpen}
       >
         <span className="sr-only">Notifications</span>
-        <svg
-          className="fill-current text-gray-500/80 dark:text-gray-400/80"
-          width={16}
-          height={16}
-          viewBox="0 0 16 16"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M7 0a7 7 0 0 0-7 7c0 1.202.308 2.33.84 3.316l-.789 2.368a1 1 0 0 0 1.265 1.265l2.595-.865a1 1 0 0 0-.632-1.898l-.698.233.3-.9a1 1 0 0 0-.104-.85A4.97 4.97 0 0 1 2 7a5 5 0 0 1 5-5 4.99 4.99 0 0 1 4.093 2.135 1 1 0 1 0 1.638-1.148A6.99 6.99 0 0 0 7 0Z" />
-          <path d="M11 6a5 5 0 0 0 0 10c.807 0 1.567-.194 2.24-.533l1.444.482a1 1 0 0 0 1.265-1.265l-.482-1.444A4.962 4.962 0 0 0 16 11a5 5 0 0 0-5-5Zm-3 5a3 3 0 0 1 6 0c0 .588-.171 1.134-.466 1.6a1 1 0 0 0-.115.82 1 1 0 0 0-.82.114A2.973 2.973 0 0 1 11 14a3 3 0 0 1-3-3Z" />
-        </svg>
-        <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-gray-100 dark:border-gray-900 rounded-full"></div>
+        <NotificationIcon unread={unreadCount} />
       </button>
 
-      <Transition
-        className={`origin-top-right z-10 absolute top-full -mr-48 sm:mr-0 min-w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1 ${align === 'right' ? 'right-0' : 'left-0'}`}
-        show={dropdownOpen}
-        enter="transition ease-out duration-200 transform"
-        enterStart="opacity-0 -translate-y-2"
-        enterEnd="opacity-100 translate-y-0"
-        leave="transition ease-out duration-200"
-        leaveStart="opacity-100"
-        leaveEnd="opacity-0"
-      >
+      {dropdownOpen && (
         <div
-          ref={dropdown}
-          onFocus={() => setDropdownOpen(true)}
-          onBlur={() => setDropdownOpen(false)}
+          id="notifications-dropdown"
+          className={`absolute mt-2 w-72 bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700 z-50 ${align === 'right' ? 'right-0' : 'left-0'}`}
         >
-          <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase pt-1.5 pb-2 px-4">Notifications</div>
-          <ul>
-            <li className="border-b border-gray-200 dark:border-gray-700/60 last:border-0">
-              <Link
-                className="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-700/20"
-                to="#0"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              Notifications {unreadCount > 0 && `(${unreadCount})`}
+            </h3>
+            {unreadCount > 0 && (
+              <button 
+                onClick={markAllAsRead}
+                className="text-xs text-violet-500 hover:text-violet-600 dark:hover:text-violet-400"
               >
-                <span className="block text-sm mb-2">📣 <span className="font-medium text-gray-800 dark:text-gray-100">Software enginner</span> Notfiction update .</span>
-                <span className="block text-xs font-medium text-gray-400 dark:text-gray-500">Feb 12, 2024</span>
+                Mark all as read
+              </button>
+            )}
+          </div>
+          <div className="divide-y divide-gray-200 dark:divide-gray-700 overflow-y-auto max-h-80">
+            {notifications.length > 0 ? (
+              notifications.map(notification => (
+                <NotificationItem 
+                  key={notification.id} 
+                  notification={notification} 
+                  onDismiss={dismissNotification}
+                />
+              ))
+            ) : (
+              <div className="px-4 py-6 text-center">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1}
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
+                </svg>
+                <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No notifications</h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  You don't have any notifications yet.
+                </p>
+              </div>
+            )}
+          </div>
+          {notifications.length > 0 && (
+            <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 text-center">
+              <Link
+                to="/notifications"
+                className="text-xs font-medium text-violet-500 hover:text-violet-600 dark:hover:text-violet-400"
+                onClick={() => setDropdownOpen(false)}
+              >
+                View all notifications
               </Link>
-            </li>
-            <li className="border-b border-gray-200 dark:border-gray-700/60 last:border-0">
-         
-            </li>
-            <li className="border-b border-gray-200 dark:border-gray-700/60 last:border-0">
-      
-            </li>
-          </ul>
+            </div>
+          )}
         </div>
-      </Transition>
+      )}
     </div>
-  )
+  );
 }
-
-export default DropdownNotifications;

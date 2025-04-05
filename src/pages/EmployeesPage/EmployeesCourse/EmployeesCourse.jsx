@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import joblkimg from "../../../Assets/joblk.png";
-import Header from "../../../partials/Header";
 import Banner from "../../../comon/Banner/Banner";
-import EmployeesSidebar from "../../../partials/EmployeesSidebar";
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
 import Swal from "sweetalert2";
 import { CircleUserRound, X } from 'lucide-react';
+import EmployeesHeader from "../../../Headers/EmployeesHeader";
 
 function EmployeesCourse() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -184,10 +183,9 @@ function EmployeesCourse() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <EmployeesSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <EmployeesHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {showPopup && selectedCourse && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">

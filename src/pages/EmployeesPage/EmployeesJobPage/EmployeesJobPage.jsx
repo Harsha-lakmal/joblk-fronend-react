@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../../partials/Header';
-import EmployeesSidebar from '../../../partials/EmployeesSidebar';
 import AddJob from '../../../comon/AddJobs/AddJobs';
 import Banner from '../../../comon/Banner/Banner';
 import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
 import joblkimg from '../../../Assets/joblk.png';
 import { CircleUserRound, X } from 'lucide-react';
 import Swal from "sweetalert2";
+import EmployeesHeader from '../../../Headers/EmployeesHeader';
 
 
 function EmployeesJobPage() {
@@ -186,9 +185,8 @@ function EmployeesJobPage() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <EmployeesSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <EmployeesHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {showPopup && selectedJob && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">

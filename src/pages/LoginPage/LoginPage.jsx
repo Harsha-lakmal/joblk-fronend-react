@@ -91,7 +91,7 @@ export default function LoginPage() {
             }else if (response.data.role == "Employee"){
                 navigate('/error');
             }else if (response.data.role == "Employees"){
-                navigate('/employees/dashboard');
+                navigate('/employees/dashboard/home');
             }
             else if (response.data.role == "Trainer"){
                 navigate('/trainers/dashboard');

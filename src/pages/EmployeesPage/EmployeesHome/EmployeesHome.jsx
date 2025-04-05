@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import EmployeesSidebar from '../../../partials/EmployeesSidebar';
 import Banner from '../../../comon/Banner/Banner';
-import Header from '../../../partials/Header';
 import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
 import joblkimg from '../../../Assets/joblk.png';
 import Swal from 'sweetalert2';
 import { CircleUserRound, X } from 'lucide-react';
+import EmployeesHeader from '../../../Headers/EmployeesHeader';
 
-function EmployeesDashboard() {
+function EmployeesHome() {
   const [jobs, setJobs] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -259,9 +258,8 @@ function EmployeesDashboard() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <EmployeesSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <EmployeesHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {/* Compact Popup Window */}
         {showPopup && selectedItem && (
@@ -468,4 +466,4 @@ function EmployeesDashboard() {
   );
 }
 
-export default EmployeesDashboard;
+export default EmployeesHome;

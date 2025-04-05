@@ -2,9 +2,9 @@ import React, { useEffect,useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import '../css/style.css';
 import EmployeesAbout from '../pages/EmployeesPage/EmployeesAbout/EmployeesAbout';
-import EmployeesDashboard from '../pages/EmployeesPage/EmployeesDashboard/EmployeesDashboard';
 import EmployeesJobPage from '../pages/EmployeesPage/EmployeesJobPage/EmployeesJobPage';
-import EmployeesCourse from '../pages/EmployeesPage/EmployeesCourse/EmployeesCourse';
+import EmployeesCourse from '../pages/EmployeesPage/EmployeesCourse/EmployeesCourse'
+import EmployeesHome from '../pages/EmployeesPage/EmployeesHome/EmployeesHome';
 
 import TrainersJobPage from '../pages/TrainersPage/TrainersJobPage/TrainersJobPage';
 import TrainersAbout from '../pages/TrainersPage/TrainersAbout/TrainersAbout';
@@ -35,7 +35,7 @@ function App() {
       <Route path="/*" element={<LoginPage />} />
       <Route path="/signup" element={<LoginPage />} /> 
       <Route path="/sign" element={<SignPage />} />
-      <Route path="/employees/dashboard" element={<EmployeesDashboard />} />
+      <Route path="/employees/dashboard/home" element={<EmployeesHome />} />
       <Route path="/employees/dashboard/about" element={<EmployeesAbout />} />
       <Route path="/employees/dashboard/course" element={<EmployeesCourse />} />
       <Route path="/employees/dashboard/job" element={<EmployeesJobPage />} />
