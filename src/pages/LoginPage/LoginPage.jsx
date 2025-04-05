@@ -86,7 +86,7 @@ export default function LoginPage() {
             console.log(response.data.role);
             
             if (response.data.role == "Admin") {
-                navigate('/admin/dashboard');
+                navigate('/admin/dashboard/home');
 
             }else if (response.data.role == "Employee"){
                 navigate('/error');
