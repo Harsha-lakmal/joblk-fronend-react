@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../../partials/Header';
 import Banner from '../../../comon/Banner/Banner';
-import TrainersSidebar from '../../../partials/TrainersSidebar';
 import joblkimg from '../../../Assets/joblk.png';
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
 import Swal from "sweetalert2";
 import { CircleUserRound, X } from 'lucide-react';
+import TrainersHeader from '../../../Headers/TrainersHeader';
 
 
-function TrainersDashboard() {
+function TrainersHome() {
   const [jobs, setJobs] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -260,9 +259,8 @@ function TrainersDashboard() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <TrainersSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <TrainersHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {/* Compact Popup Window */}
         {showPopup && selectedItem && (
@@ -470,4 +468,4 @@ function TrainersDashboard() {
   );
 }
 
-export default TrainersDashboard;
+export default TrainersHome;

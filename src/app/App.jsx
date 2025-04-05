@@ -8,7 +8,7 @@ import EmployeesHome from '../pages/EmployeesPage/EmployeesHome/EmployeesHome';
 
 import TrainersJobPage from '../pages/TrainersPage/TrainersJobPage/TrainersJobPage';
 import TrainersAbout from '../pages/TrainersPage/TrainersAbout/TrainersAbout';
-import TrainersDashboard from '../pages/TrainersPage/TrainersDashboard/TrainersDashboard';
+import TrainersHome from '../pages/TrainersPage/TrainersHome/TrainersHome';
 import TrainersCourse from '../pages/TrainersPage/TrainersCourse/TrainersCourse';
 
 import AdminUserPage from '../pages/AdminPage/AdminUserPage/AdminUserPage';
@@ -39,7 +39,7 @@ function App() {
       <Route path="/employees/dashboard/about" element={<EmployeesAbout />} />
       <Route path="/employees/dashboard/course" element={<EmployeesCourse />} />
       <Route path="/employees/dashboard/job" element={<EmployeesJobPage />} />
-      <Route path="/trainers/dashboard" element={<TrainersDashboard />} />
+      <Route path="/trainers/dashboard/home" element={<TrainersHome />} />
       <Route path="/trainers/dashboard/about" element={<TrainersAbout />} />
       <Route path="/trainers/dashboard/course" element={<TrainersCourse />} />
       <Route path="/trainers/dashboard/job" element={<TrainersJobPage />} />

@@ -94,7 +94,7 @@ export default function LoginPage() {
                 navigate('/employees/dashboard/home');
             }
             else if (response.data.role == "Trainer"){
-                navigate('/trainers/dashboard');
+                navigate('/trainers/dashboard/home');
             }
 
             return response.data;

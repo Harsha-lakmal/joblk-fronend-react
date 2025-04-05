@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
-import Header from "../../../partials/Header";
 import Banner from "../../../comon/Banner/Banner";
-import TrainersSidebar from "../../../partials/TrainersSidebar";
 import Swal from "sweetalert2";
 import { CircleUserRound, X } from 'lucide-react';
-import AddJob from "../../../comon/AddJobs/AddJobs"; // Added missing import
+import AddJob from "../../../comon/AddJobs/AddJobs"; 
+import TrainersHeader from "../../../Headers/TrainersHeader";
 
 function TrainersJobPage() {
   const [jobs, setJobs] = useState([]);
@@ -180,9 +179,8 @@ function TrainersJobPage() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <TrainersSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <TrainersHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {showPopup && selectedJob && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">
