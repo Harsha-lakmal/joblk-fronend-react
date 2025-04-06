@@ -3,7 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import '../css/style.css';
 import EmployeesAbout from '../pages/EmployeesPage/EmployeesAbout/EmployeesAbout';
 import EmployeesJobPage from '../pages/EmployeesPage/EmployeesJobPage/EmployeesJobPage';
-import EmployeesCourse from '../pages/EmployeesPage/EmployeesCourse/EmployeesCourse'
+import EmployeesDocument from '../pages/EmployeesPage/EmployeesDocument/EmployeesDocument'
 import EmployeesHome from '../pages/EmployeesPage/EmployeesHome/EmployeesHome';
 
 import TrainersJobPage from '../pages/TrainersPage/TrainersJobPage/TrainersJobPage';
@@ -19,7 +19,7 @@ import AdminAboutPage from '../pages/AdminPage/AdminAboutPage/AdminAboutPage';
 import LoginPage from '../pages/LoginPage/LoginPage';
 import SignPage from '../pages/SignPage/SignPage'
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
-import ProfilePage from '../pages/ProfilePage/ProfilePage';
+import ProfilePage from '../pages/SettingPage/SettingPage';
 
 function App() {
   const location = useLocation();
@@ -37,7 +37,7 @@ function App() {
       <Route path="/sign" element={<SignPage />} />
       <Route path="/employees/dashboard/home" element={<EmployeesHome />} />
       <Route path="/employees/dashboard/about" element={<EmployeesAbout />} />
-      <Route path="/employees/dashboard/course" element={<EmployeesCourse />} />
+      <Route path="/employees/dashboard/course" element={<EmployeesDocument />} />
       <Route path="/employees/dashboard/job" element={<EmployeesJobPage />} />
       <Route path="/trainers/dashboard/home" element={<TrainersHome />} />
       <Route path="/trainers/dashboard/about" element={<TrainersAbout />} />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Banner from '../../../comon/Banner/Banner';
-import SettingPage from '../../ProfilePage/ProfilePage'
+import SettingPage from '../../SettingPage/SettingPage'
 import TrainersHeader from '../../../Headers/TrainersHeader';
 
 function TrainersAbout() {

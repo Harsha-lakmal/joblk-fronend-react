@@ -3,13 +3,11 @@ import AddJob from '../../../comon/AddJobs/AddJobs';
 import Banner from '../../../comon/Banner/Banner';
 import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
 import joblkimg from '../../../Assets/joblk.png';
-import { CircleUserRound, X } from 'lucide-react';
+import { CircleUserRound, X, Trash2, Edit } from 'lucide-react';
 import Swal from "sweetalert2";
 import EmployeesHeader from '../../../Headers/EmployeesHeader';
 
-
 function EmployeesJobPage() {
-
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,29 +17,44 @@ function EmployeesJobPage() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [uploadDates, setUploadDates] = useState({});
+  const [editingJob, setEditingJob] = useState(null);
   const token = localStorage.getItem('authToken');
 
+  const showSuccessMessage = (message) => {
+    Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: message || "Successfully completed.",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
 
-    const showSuccessMessage = () => {
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: "Successfully uploaded your CV.",
-        showConfirmButton: false,
-        timer: 2000,
-      });
-    };
-  
-    const showErrorMessage = (msg) => {
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: msg || "Error. Try again later.",
-        showConfirmButton: false,
-        timer: 2000,
-      });
-    };
+  const showErrorMessage = (msg) => {
+    Swal.fire({
+      position: "top-end",
+      icon: "error",
+      title: msg || "Error. Try again later.",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
 
+  const showConfirmationDialog = (title, text, confirmCallback) => {
+    Swal.fire({
+      title: title || "Are you sure?",
+      text: text || "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, proceed"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        confirmCallback();
+      }
+    });
+  };
 
   useEffect(() => {
     if (!token) {
@@ -50,20 +63,30 @@ function EmployeesJobPage() {
       return;
     }
 
-    getData(); 
+    getData();
     const interval = setInterval(() => {
-      checkForChangesAlternative(); 
+      checkForChangesAlternative();
     }, 4000);
 
     return () => clearInterval(interval);
   }, [token]);
 
   const getData = () => {
+    const storedUserData = localStorage.getItem("userData");
+    if (!storedUserData) {
+      showErrorMessage("User data not found.");
+      return;
+    }
+
+    const parsedUserData = JSON.parse(storedUserData);
+    const userId = parsedUserData.id;
+
+    if (!userId || !token) return;
+
     setLoading(true);
-    instance
-      .get('/job/getAllJobsDetails', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    instance.get('/job/getJobsUsersId/' + userId, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((response) => {
         setJobs(response.data);
         response.data.forEach((job) => {
@@ -82,9 +105,66 @@ function EmployeesJobPage() {
       });
   };
 
+  const deleteJob = (jobId) => {
+    showConfirmationDialog(
+      "Delete Job",
+      "Are you sure you want to delete this job posting?",
+      () => {
+        setLoading(true);
+        instance.delete(`/job/deleteJob/${jobId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((response) => {
+            showSuccessMessage("Job deleted successfully");
+            getData(); // Refresh the job list
+          })
+          .catch((error) => {
+            setLoading(false);
+            showErrorMessage("Failed to delete job");
+            console.error(error);
+          });
+      }
+    );
+  };
+
+  const startEditing = (job) => {
+    setEditingJob({ ...job });
+  };
+
+  const cancelEditing = () => {
+    setEditingJob(null);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditingJob(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const updateJob = () => {
+    if (!editingJob) return;
+
+    setLoading(true);
+    instance.put('/job/updateJob', editingJob, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((response) => {
+        showSuccessMessage("Job updated successfully");
+        setEditingJob(null);
+        getData(); // Refresh the job list
+      })
+      .catch((error) => {
+        setLoading(false);
+        showErrorMessage("Failed to update job");
+        console.error(error);
+      });
+  };
+
   const getimg = (jobId) => {
-    if (jobsImages[jobId]) return; 
-    
+    if (jobsImages[jobId]) return;
+
     instance
       .get(`/job/get/image/${jobId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -101,8 +181,18 @@ function EmployeesJobPage() {
   };
 
   const checkForChangesAlternative = () => {
-    instance
-      .get('/job/getAllJobsDetails', { headers: { Authorization: `Bearer ${token}` } })
+    const storedUserData = localStorage.getItem("userData");
+    if (!storedUserData) {
+      showErrorMessage("User data not found.");
+      return;
+    }
+
+    const parsedUserData = JSON.parse(storedUserData);
+    const userId = parsedUserData.id;
+
+    if (!userId || !token) return;
+
+    instance.get('/job/getJobsUsersId/' + userId, { headers: { Authorization: `Bearer ${token}` } })
       .then((response) => {
         const newJobs = response.data;
         if (JSON.stringify(newJobs) !== JSON.stringify(jobs)) {
@@ -144,39 +234,6 @@ function EmployeesJobPage() {
     }
   };
 
-  
-  const cvUploadHandle = async () => {
-    try {
-      const storedUserData = localStorage.getItem("userData");
-      if (!storedUserData) {
-        showErrorMessage("User data not found.");
-        return;
-      }
-
-      const parsedUserData = JSON.parse(storedUserData);
-      const userId = parsedUserData.id;
-
-      if (!userId || !token) return;
-
-      const response = await instance.get(`/user/getCvDocument/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: "blob",
-      });
-
-      if (response.data) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          console.log(reader.result);
-          showSuccessMessage();
-        };
-        reader.readAsDataURL(response.data);
-      }
-    } catch (err) {
-      showErrorMessage();
-      console.error("Error fetching CV document:", err);
-    }
-  };
-
   useEffect(() => {
     return () => {
       Object.values(jobsImages).forEach(url => URL.revokeObjectURL(url));
@@ -192,8 +249,8 @@ function EmployeesJobPage() {
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-semibold text-lg">Publisher Details</h3>
-              <button 
-                onClick={() => setShowPopup(false)} 
+              <button
+                onClick={() => setShowPopup(false)}
                 className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               >
                 <X size={20} />
@@ -233,16 +290,16 @@ function EmployeesJobPage() {
         <main className="grow">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
             <div className="mb-8">
-              <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold mb-4" style={{color: "#6495ED"}}>
+              <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold mb-4" style={{ color: "#6495ED" }}>
                 Job Opportunities
               </h1>
               <AddJob onJobAdded={getData} />
             </div>
-            
+
             {error && <div className="text-center py-4 text-red-500">{error}</div>}
             {loading && jobs.length === 0 && <div className="text-center py-4">Loading jobs...</div>}
             {loading && jobs.length > 0 && <div className="text-center py-2 text-blue-500">Refreshing data...</div>}
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {jobs.length === 0 && !loading ? (
                 <div className="col-span-full text-center py-4 text-gray-500 dark:text-gray-400">
@@ -253,9 +310,9 @@ function EmployeesJobPage() {
                   <div key={job.jobId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden flex flex-col hover:scale-[1.02] transition-transform duration-300 h-full">
                     {/* Image with title overlay */}
                     <div className="relative h-48 w-full">
-                      <img 
-                        src={jobsImages[job.jobId] || joblkimg} 
-                        alt="Job" 
+                      <img
+                        src={jobsImages[job.jobId] || joblkimg}
+                        alt="Job"
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
@@ -263,7 +320,7 @@ function EmployeesJobPage() {
                           {job.jobTitle}
                         </h2>
                       </div>
-                      <button 
+                      <button
                         onClick={() => handleTallyClick(job)}
                         className="absolute top-2 right-2 z-10 text-white hover:text-blue-300 transition bg-black/30 p-1 rounded-full"
                       >
@@ -273,31 +330,107 @@ function EmployeesJobPage() {
 
                     {/* Job details */}
                     <div className="p-5 flex-grow">
-                      <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                        {job.jobDescription}
-                      </p>
-                      
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex">
-                          <span className="font-medium min-w-[110px]">Qualifications:</span>
-                          <span className="text-gray-700 dark:text-gray-300">{job.qualifications}</span>
-                        </li>
-                        <li className="flex">
-                          <span className="font-medium min-w-[110px]">Closing Date:</span>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {new Date(job.jobClosingDate).toLocaleDateString()}
-                          </span>
-                        </li>
-                        <li className="flex">
-                          <span className="font-medium min-w-[110px]">Location:</span>
-                          <span className="text-gray-700 dark:text-gray-300">Panadura</span>
-                        </li>
-                      </ul>
+                      {editingJob?.jobId === job.jobId ? (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Title</label>
+                            <input
+                              type="text"
+                              name="jobTitle"
+                              value={editingJob.jobTitle}
+                              onChange={handleEditChange}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Description</label>
+                            <textarea
+                              name="jobDescription"
+                              value={editingJob.jobDescription}
+                              onChange={handleEditChange}
+                              className="w-full p-2 border rounded"
+                              rows="3"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Qualifications</label>
+                            <input
+                              type="text"
+                              name="qualifications"
+                              value={editingJob.qualifications}
+                              onChange={handleEditChange}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Closing Date</label>
+                            <input
+                              type="date"
+                              name="jobClosingDate"
+                              value={editingJob.jobClosingDate ? editingJob.jobClosingDate.split('T')[0] : ''}
+                              onChange={handleEditChange}
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                            {job.jobDescription}
+                          </p>
+
+                          <ul className="space-y-2 text-sm">
+                            <li className="flex">
+                              <span className="font-medium min-w-[110px]">Qualifications:</span>
+                              <span className="text-gray-700 dark:text-gray-300">{job.qualifications}</span>
+                            </li>
+                            <li className="flex">
+                              <span className="font-medium min-w-[110px]">Closing Date:</span>
+                              <span className="text-gray-700 dark:text-gray-300">
+                                {new Date(job.jobClosingDate).toLocaleDateString()}
+                              </span>
+                            </li>
+                            <li className="flex">
+                              <span className="font-medium min-w-[110px]">Location:</span>
+                              <span className="text-gray-700 dark:text-gray-300">Panadura</span>
+                            </li>
+                          </ul>
+                        </>
+                      )}
                     </div>
 
-                  
-                    <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                     
+                    <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+                      {editingJob?.jobId === job.jobId ? (
+                        <>
+                          <button
+                            onClick={cancelEditing}
+                            className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 px-3 py-1 rounded transition"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={updateJob}
+                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition"
+                          >
+                            Save Changes
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => deleteJob(job.jobId)}
+                            className="text-red-500 hover:text-red-700 dark:hover:text-red-400 flex items-center gap-1 px-3 py-1 rounded transition"
+                          >
+                            <Trash2 size={16} /> Delete
+                          </button>
+                          <button
+                            onClick={() => startEditing(job)}
+                            className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 px-3 py-1 rounded transition"
+                          >
+                            <Edit size={16} /> Edit
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))
@@ -311,4 +444,4 @@ function EmployeesJobPage() {
   );
 }
 
-export default EmployeesJobPage;  
+export default EmployeesJobPage;

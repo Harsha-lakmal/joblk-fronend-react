@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Banner from '../../../comon/Banner/Banner';
- import ProfilePage from '../../ProfilePage/ProfilePage';
+ import ProfilePage from '../../SettingPage/SettingPage';
  import AddJobs from '../../../comon/AddJobs/AddJobs';
  import AdminHeader from '../../../Headers/AdminHeader';
 

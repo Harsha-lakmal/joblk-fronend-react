@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import { CircleUserRound, X } from 'lucide-react';
 import EmployeesHeader from "../../../Headers/EmployeesHeader";
 
-function EmployeesCourse() {
+function EmployeesDocument() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -234,7 +234,7 @@ function EmployeesCourse() {
             <div className="sm:flex sm:justify-between sm:items-center mb-8">
               <div className="mb-4 sm:mb-0">
                 <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{ color: "#6495ED" }}>
-                  Course Opportunities
+                Appyed Document
                 </h1>
               </div>
             </div>
@@ -320,4 +320,4 @@ function EmployeesCourse() {
   );
 }
 
-export default EmployeesCourse;
+export default EmployeesDocument;
