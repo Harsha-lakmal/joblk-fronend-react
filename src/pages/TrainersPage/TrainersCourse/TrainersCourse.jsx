@@ -3,7 +3,7 @@ import Banner from '../../../comon/Banner/Banner';
 import AddCourse from '../../../comon/AddCourse/AddCourse';
 import joblkimg from '../../../Assets/joblk.png';
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
-import { CircleUserRound, X } from 'lucide-react';
+import { CircleUserRound, X, Trash2, Edit } from 'lucide-react';
 import Swal from 'sweetalert2';
 import TrainersHeader from '../../../Headers/TrainersHeader';
 
@@ -17,25 +17,42 @@ function TrainersCourse() {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
+  const [editingCourse, setEditingCourse] = useState(null);
   const token = localStorage.getItem("authToken");
 
-  const showSuccessMessage = () => {
+  const showSuccessMessage = (msg = "Operation successful") => {
     Swal.fire({
       position: "top-end",
       icon: "success",
-      title: "Successfully uploaded your CV.",
+      title: msg,
       showConfirmButton: false,
       timer: 2000,
     });
   };
 
-  const showErrorMessage = (msg) => {
+  const showErrorMessage = (msg = "Error. Try again later.") => {
     Swal.fire({
       position: "top-end",
       icon: "error",
-      title: msg || "Error. Try again later.",
+      title: msg,
       showConfirmButton: false,
       timer: 2000,
+    });
+  };
+
+  const showConfirmationDialog = (title, text, confirmCallback) => {
+    Swal.fire({
+      title: title,
+      text: text,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, proceed!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        confirmCallback();
+      }
     });
   };
 
@@ -51,10 +68,22 @@ function TrainersCourse() {
     return () => clearInterval(interval);
   }, [token]);
 
+  const getUserId = () => {
+    const storedUserData = localStorage.getItem("userData");
+    if (!storedUserData) {
+      showErrorMessage("User data not found.");
+      return null;
+    }
+    return JSON.parse(storedUserData).id;
+  };
+
   const getData = async () => {
     try {
       setLoading(true);
-      const response = await instance.get("/course/getAllCourseDetails", {
+      const userId = getUserId();
+      if (!userId) return;
+
+      const response = await instance.get(`/course/getCourseUsersId/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -78,6 +107,63 @@ function TrainersCourse() {
     }
   };
 
+  const deleteCourse = (courseId) => {
+    showConfirmationDialog(
+      "Delete Course",
+      "Are you sure you want to delete this course?",
+      () => {
+        setLoading(true);
+        instance.delete(`/course/deleteCourse/${courseId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then(() => {
+            showSuccessMessage("Course deleted successfully");
+            getData();
+          })
+          .catch((error) => {
+            setLoading(false);
+            showErrorMessage("Failed to delete course");
+            console.error(error);
+          });
+      }
+    );
+  };
+
+  const startEditing = (course) => {
+    setEditingCourse({ ...course });
+  };
+
+  const cancelEditing = () => {
+    setEditingCourse(null);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditingCourse(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const updateCourse = () => {
+    if (!editingCourse) return;
+
+    setLoading(true);
+    instance.put('/course/updateCourse', editingCourse, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        showSuccessMessage("Course updated successfully");
+        setEditingCourse(null);
+        getData();
+      })
+      .catch((error) => {
+        setLoading(false);
+        showErrorMessage("Failed to update course");
+        console.error(error);
+      });
+  };
+
   const getCourseImage = async (courseId) => {
     try {
       const res = await instance.get(`/course/get/image/${courseId}`, {
@@ -96,8 +182,11 @@ function TrainersCourse() {
   };
 
   const checkForChanges = async () => {
+    const userId = getUserId();
+    if (!userId || !token) return;
+    
     try {
-      const response = await instance.get("/course/getAllCourseDetails", {
+      const response = await instance.get(`/course/getCourseUsersId/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -116,38 +205,6 @@ function TrainersCourse() {
       }
     } catch (error) {
       console.error("Failed to check for course updates:", error);
-    }
-  };
-
-  const cvUploadHandle = async () => {
-    try {
-      const storedUserData = localStorage.getItem("userData");
-      if (!storedUserData) {
-        showErrorMessage("User data not found.");
-        return;
-      }
-
-      const parsedUserData = JSON.parse(storedUserData);
-      const userId = parsedUserData.id;
-
-      if (!userId || !token) return;
-
-      const response = await instance.get(`/user/getCvDocument/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: "blob",
-      });
-
-      if (response.data) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          console.log(reader.result);
-          showSuccessMessage();
-        };
-        reader.readAsDataURL(response.data);
-      }
-    } catch (err) {
-      showErrorMessage();
-      console.error("Error fetching CV document:", err);
     }
   };
 
@@ -196,7 +253,7 @@ function TrainersCourse() {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <TrainersHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        {/* Compact Popup Window */}
+        {/* Publisher Details Popup */}
         {showPopup && selectedCourse && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">
             <div className="flex justify-between items-center mb-3">
@@ -235,6 +292,101 @@ function TrainersCourse() {
               >
                 Close
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Course Modal */}
+        {editingCourse && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-2xl overflow-hidden">
+              <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-lg">Edit Course</h3>
+                <button 
+                  onClick={cancelEditing}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block mb-2 text-sm font-medium">Title</label>
+                  <input
+                    type="text"
+                    name="courseTitle"
+                    value={editingCourse.courseTitle}
+                    onChange={handleEditChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium">Description</label>
+                  <textarea
+                    name="courseDescription"
+                    value={editingCourse.courseDescription}
+                    onChange={handleEditChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                    rows="3"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium">Content</label>
+                  <textarea
+                    name="courseContent"
+                    value={editingCourse.courseContent}
+                    onChange={handleEditChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                    rows="3"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium">Qualifications</label>
+                  <input
+                    type="text"
+                    name="courseQualification"
+                    value={editingCourse.courseQualification}
+                    onChange={handleEditChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium">Start Date</label>
+                  <input
+                    type="text"
+                    name="courseStartDate"
+                    value={editingCourse.courseStartDate}
+                    onChange={handleEditChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium">Location</label>
+                  <input
+                    type="text"
+                    name="courseLocation"
+                    value={editingCourse.courseLocation}
+                    onChange={handleEditChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex justify-end space-x-3">
+                <button
+                  onClick={cancelEditing}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-600 dark:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={updateCourse}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -311,9 +463,20 @@ function TrainersCourse() {
                       </ul>
                     </div>
 
-                    {/* Action Button */}
-                    <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                     
+                    {/* Action Buttons */}
+                    <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+                      <button
+                        onClick={() => deleteCourse(course.courseId)}
+                        className="text-red-500 hover:text-red-700 dark:hover:text-red-400 flex items-center gap-1 px-3 py-1 rounded transition"
+                      >
+                        <Trash2 size={16} /> Delete
+                      </button>
+                      <button
+                        onClick={() => startEditing(course)}
+                        className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 px-3 py-1 rounded transition"
+                      >
+                        <Edit size={16} /> Edit
+                      </button>
                     </div>
                   </div>
                 ))}

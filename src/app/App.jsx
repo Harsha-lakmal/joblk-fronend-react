@@ -6,7 +6,7 @@ import EmployeesJobPage from '../pages/EmployeesPage/EmployeesJobPage/EmployeesJ
 import EmployeesDocument from '../pages/EmployeesPage/EmployeesDocument/EmployeesDocument'
 import EmployeesHome from '../pages/EmployeesPage/EmployeesHome/EmployeesHome';
 
-import TrainersJobPage from '../pages/TrainersPage/TrainersJobPage/TrainersJobPage';
+import TrainersDocument from '../pages/TrainersPage/TrainersDocument/TrainersDocument';
 import TrainersAbout from '../pages/TrainersPage/TrainersAbout/TrainersAbout';
 import TrainersHome from '../pages/TrainersPage/TrainersHome/TrainersHome';
 import TrainersCourse from '../pages/TrainersPage/TrainersCourse/TrainersCourse';
@@ -37,12 +37,12 @@ function App() {
       <Route path="/sign" element={<SignPage />} />
       <Route path="/employees/dashboard/home" element={<EmployeesHome />} />
       <Route path="/employees/dashboard/about" element={<EmployeesAbout />} />
-      <Route path="/employees/dashboard/course" element={<EmployeesDocument />} />
+      <Route path="/employees/dashboard/document" element={<EmployeesDocument />} />
       <Route path="/employees/dashboard/job" element={<EmployeesJobPage />} />
       <Route path="/trainers/dashboard/home" element={<TrainersHome />} />
       <Route path="/trainers/dashboard/about" element={<TrainersAbout />} />
       <Route path="/trainers/dashboard/course" element={<TrainersCourse />} />
-      <Route path="/trainers/dashboard/job" element={<TrainersJobPage />} />
+      <Route path="/trainers/dashboard/document" element={<TrainersDocument />} />
       <Route path="/admin/dashboard/home" element={<AdminUserPage />} />
       <Route path="/admin/dashboard/job" element={<AdminJobPage />} />
       <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />  

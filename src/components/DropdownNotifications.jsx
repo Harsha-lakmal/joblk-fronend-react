@@ -99,15 +99,8 @@ export default function DropdownNotifications({ align = 'right' }) {
       time: '5 hours ago',
       read: true,
       type: 'warning'
-    },
-    {
-      id: 4,
-      title: 'Payment received',
-      message: 'Your payment of $120 has been processed',
-      time: '1 day ago',
-      read: true,
-      type: 'success'
     }
+    
   ]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -199,7 +192,7 @@ export default function DropdownNotifications({ align = 'right' }) {
           {notifications.length > 0 && (
             <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 text-center">
               <Link
-                to="/notifications"
+                // to="/"
                 className="text-xs font-medium text-violet-500 hover:text-violet-600 dark:hover:text-violet-400"
                 onClick={() => setDropdownOpen(false)}
               >

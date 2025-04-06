@@ -217,38 +217,6 @@ function TrainersHome() {
     }
   };
 
-  const cvUploadHandle = async () => {
-    try {
-      const storedUserData = localStorage.getItem("userData");
-      if (!storedUserData) {
-        showErrorMessage("User data not found.");
-        return;
-      }
-
-      const parsedUserData = JSON.parse(storedUserData);
-      const userId = parsedUserData.id;
-
-      if (!userId || !token) return;
-
-      const response = await instance.get(`/user/getCvDocument/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: "blob",
-      });
-
-      if (response.data) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          console.log(reader.result);
-          showSuccessMessage();
-        };
-        reader.readAsDataURL(response.data);
-      }
-    } catch (err) {
-      showErrorMessage();
-      console.error("Error fetching CV document:", err);
-    }
-  };
-
   // Cleanup effects
   useEffect(() => {
     return () => {
@@ -384,12 +352,7 @@ function TrainersHome() {
                       </div>
 
                       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                      <button 
-                          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition"
-                          onClick={cvUploadHandle}
-                        >
-                          Apply Now
-                        </button>
+                      
                 
                       </div>
                     </div>
