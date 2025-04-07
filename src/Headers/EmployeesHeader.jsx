@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, FileCheck , BookOpen, Briefcase, X, Settings  } from 'lucide-react';
+import { Home, FileCheck, BookOpen, Briefcase, X, Settings } from 'lucide-react';
 import Notifications from '../components/DropdownNotifications';
 import UserMenu from '../components/DropdownProfile';
+import ThemeToggle from '../components/ThemeToggle';
+
 
 function SidebarLinkGroup({ children, activecondition }) {
   return (
@@ -32,7 +34,7 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
         setSearchModalOpen(false);
       }
     };
-    
+
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [mobileNavOpen, searchModalOpen]);
@@ -78,7 +80,7 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 <NavLink
                   end
                   to="/employees/dashboard/home"
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `flex items-center px-4 py-2 rounded-lg transition-colors group ${isActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400'} cursor-pointer`
                   }
                 >
@@ -87,18 +89,18 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 </NavLink>
               </SidebarLinkGroup>
 
-           
 
-              <SidebarLinkGroup activecondition={location.pathname === "/employees/dashboard/document"}>
+
+              <SidebarLinkGroup activecondition={location.pathname === "/employees/dashboard/applicants"}>
                 <NavLink
                   end
-                  to="/employees/dashboard/document"
-                  className={({ isActive }) => 
+                  to="/employees/dashboard/applicants"
+                  className={({ isActive }) =>
                     `flex items-center px-4 py-2 rounded-lg transition-colors group ${isActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400'} cursor-pointer`
                   }
                 >
-                  <FileCheck  className={`w-5 h-5 mr-2 ${location.pathname === "/employees/dashboard/document" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
-                  <span className="text-sm font-medium">Document</span>
+                  <FileCheck className={`w-5 h-5 mr-2 ${location.pathname === "/employees/dashboard/applicants" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
+                  <span className="text-sm font-medium">Applicants</span>
                 </NavLink>
               </SidebarLinkGroup>
 
@@ -106,7 +108,7 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 <NavLink
                   end
                   to="/employees/dashboard/job"
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `flex items-center px-4 py-2 rounded-lg transition-colors group ${isActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400'} cursor-pointer`
                   }
                 >
@@ -120,17 +122,17 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 <NavLink
                   end
                   to="/employees/dashboard/about"
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `flex items-center px-4 py-2 rounded-lg transition-colors group ${isActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400'} cursor-pointer`
                   }
                 >
-                  <Settings  className={`w-5 h-5 mr-2 ${location.pathname === "/employees/dashboard/about" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
+                  <Settings className={`w-5 h-5 mr-2 ${location.pathname === "/employees/dashboard/about" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
                   <span className="text-sm font-medium">Settings</span>
                 </NavLink>
               </SidebarLinkGroup>
             </ul>
 
-            
+
           </nav>
 
           <div className="flex items-center space-x-3">
@@ -138,19 +140,19 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
               <Notifications align="right" />
             </div>
             <div className="hidden sm:block">
-              {/* <Help align="right" /> */}
-            </div>
+              <ThemeToggle  align="right" />           
+               </div>
             <hr className="w-px h-6 bg-gray-200 dark:bg-gray-700/60 border-none" />
             <UserMenu align="right" />
           </div>
         </div>
 
         {/* Search Modal */}
-     
+
 
         {/* Mobile Navigation */}
         {mobileNavOpen && (
-          <div 
+          <div
             id="mobile-nav"
             className="lg:hidden absolute left-0 right-0 top-16 bg-white dark:bg-gray-800 shadow-lg z-20 border-t border-gray-200 dark:border-gray-700"
           >
@@ -160,7 +162,7 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                   <NavLink
                     end
                     to="/employees/dashboard/home"
-                    className={({ isActive }) => 
+                    className={({ isActive }) =>
                       `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`
                     }
                   >
@@ -168,24 +170,24 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                     <span className="text-sm font-medium">Home</span>
                   </NavLink>
                 </li>
-              
+
                 <li>
                   <NavLink
                     end
-                    to="/employees/dashboard/document"
-                    className={({ isActive }) => 
+                    to="/employees/dashboard/applicants"
+                    className={({ isActive }) =>
                       `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`
                     }
                   >
-                    <BookOpen className="w-5 h-5 mr-3" />
-                    <span className="text-sm font-medium">Document</span>
+                    <FileCheck className="w-5 h-5 mr-3" />
+                    <span className="text-sm font-medium">Applicants</span>
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
                     end
                     to="/employees/dashboard/job"
-                    className={({ isActive }) => 
+                    className={({ isActive }) =>
                       `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`
                     }
                   >
@@ -199,7 +201,7 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                   <NavLink
                     end
                     to="/employees/dashboard/about"
-                    className={({ isActive }) => 
+                    className={({ isActive }) =>
                       `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`
                     }
                   >
@@ -218,7 +220,7 @@ function EmployeesHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-default">Help</span>
                   </div>
                 </li>
-                
+
               </ul>
 
             </nav>

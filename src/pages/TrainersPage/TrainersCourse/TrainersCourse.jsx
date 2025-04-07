@@ -396,7 +396,7 @@ function TrainersCourse() {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{ color: "#6495ED" }}>
-                  Course Opportunities
+                Your Post for View
                 </h1>
               </div>
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">

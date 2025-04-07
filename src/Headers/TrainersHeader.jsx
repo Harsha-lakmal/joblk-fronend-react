@@ -3,6 +3,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Settings, BookOpen, Briefcase, X, FileCheck } from 'lucide-react';
 import Notifications from '../components/DropdownNotifications';
 import UserMenu from '../components/DropdownProfile';
+import ThemeToggle from '../components/ThemeToggle';
+
 
 function SidebarLinkGroup({ children, activecondition }) {
   return (
@@ -134,7 +136,7 @@ function TrainersHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
               <Notifications align="right" />
             </div>
             <div className="hidden sm:block">
-              {/* <Help align="right" /> */}
+            <ThemeToggle align="right" />
             </div>
             <hr className="w-px h-6 bg-gray-200 dark:bg-gray-700/60 border-none" />
             <UserMenu align="right" />

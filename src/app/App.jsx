@@ -3,7 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import '../css/style.css';
 import EmployeesAbout from '../pages/EmployeesPage/EmployeesAbout/EmployeesAbout';
 import EmployeesJobPage from '../pages/EmployeesPage/EmployeesJobPage/EmployeesJobPage';
-import EmployeesDocument from '../pages/EmployeesPage/EmployeesDocument/EmployeesDocument'
+import EmployeesApplicants from '../pages/EmployeesPage/EmployeesApplicants/EmployeesApplicants'
 import EmployeesHome from '../pages/EmployeesPage/EmployeesHome/EmployeesHome';
 
 import TrainersDocument from '../pages/TrainersPage/TrainersDocument/TrainersDocument';
@@ -37,7 +37,7 @@ function App() {
       <Route path="/sign" element={<SignPage />} />
       <Route path="/employees/dashboard/home" element={<EmployeesHome />} />
       <Route path="/employees/dashboard/about" element={<EmployeesAbout />} />
-      <Route path="/employees/dashboard/document" element={<EmployeesDocument />} />
+      <Route path="/employees/dashboard/applicants" element={<EmployeesApplicants />} />
       <Route path="/employees/dashboard/job" element={<EmployeesJobPage />} />
       <Route path="/trainers/dashboard/home" element={<TrainersHome />} />
       <Route path="/trainers/dashboard/about" element={<TrainersAbout />} />

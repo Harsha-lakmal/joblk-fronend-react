@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Info, BookOpen, Briefcase, X, HelpCircle } from 'lucide-react';
-import SearchModal from '../components/ModalSearch';
+import { Home, FileCheck , BookOpen, Briefcase, X, Settings  } from 'lucide-react';
 import Notifications from '../components/DropdownNotifications';
 import Help from '../components/DropdownHelp';
 import UserMenu from '../components/DropdownProfile';
@@ -72,7 +71,7 @@ function AdminHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
 
           {/* Mobile logo/brand */}
           <div className="lg:hidden flex items-center">
-            <span className="text-lg font-semibold cursor-default">Dashboard</span>
+            <span className="text-lg font-semibold cursor-default">Joblk</span>
           </div>
 
           {/* Desktop Navigation */}
@@ -91,18 +90,7 @@ function AdminHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 </NavLink>
               </SidebarLinkGroup>
 
-              <SidebarLinkGroup activecondition={location.pathname === "/employees/dashboard/about"}>
-                <NavLink
-                  end
-                  to="/admin/dashboard/about"
-                  className={({ isActive }) => 
-                    `flex items-center px-4 py-2 rounded-lg transition-colors group ${isActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400'} cursor-pointer`
-                  }
-                >
-                  <Info className={`w-5 h-5 mr-2 ${location.pathname === "/employees/dashboard/about" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
-                  <span className="text-sm font-medium">About</span>
-                </NavLink>
-              </SidebarLinkGroup>
+     
 
               <SidebarLinkGroup activecondition={location.pathname === "/employees/dashboard/course"}>
                 <NavLink
@@ -114,6 +102,18 @@ function AdminHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 >
                   <BookOpen className={`w-5 h-5 mr-2 ${location.pathname === "/employees/dashboard/course" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
                   <span className="text-sm font-medium">Courses</span>
+                </NavLink>
+              </SidebarLinkGroup>
+              <SidebarLinkGroup activecondition={location.pathname === "/employees/dashboard/about"}>
+                <NavLink
+                  end
+                  to="/admin/dashboard/about"
+                  className={({ isActive }) => 
+                    `flex items-center px-4 py-2 rounded-lg transition-colors group ${isActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400'} cursor-pointer`
+                  }
+                >
+                  <Settings className={`w-5 h-5 mr-2 ${location.pathname === "/employees/dashboard/about" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
+                  <span className="text-sm font-medium">Settings</span>
                 </NavLink>
               </SidebarLinkGroup>
 
@@ -138,20 +138,14 @@ function AdminHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
             </div>
             <div className="hidden sm:block">
               {/* <Help align="right" /> */}
+              <ThemeToggle  align="right"  />
             </div>
-            <ThemeToggle />
             <hr className="w-px h-6 bg-gray-200 dark:bg-gray-700/60 border-none" />
             <UserMenu align="right" />
           </div>
         </div>
 
-        {/* Search Modal */}
-        <SearchModal 
-          id="search-modal" 
-          searchId="search" 
-          modalOpen={searchModalOpen} 
-          setModalOpen={setSearchModalOpen} 
-        />
+     
 
         {/* Mobile Navigation */}
         {mobileNavOpen && (
@@ -173,18 +167,7 @@ function AdminHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                     <span className="text-sm font-medium">Home</span>
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    end
-                    to="/admin/dashboard/about"
-                    className={({ isActive }) => 
-                      `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`
-                    }
-                  >
-                    <Info className="w-5 h-5 mr-3" />
-                    <span className="text-sm font-medium">About</span>
-                  </NavLink>
-                </li>
+                
                 <li>
                   <NavLink
                     end
@@ -215,11 +198,18 @@ function AdminHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                     <Notifications align="right" />
                   </div>
                 </li>
-                <li className="sm:hidden pt-2 border-t border-gray-200 dark:border-gray-700/60">
-                  <div className="flex items-center justify-between px-4 py-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-default">Help</span>
-                    <Help align="right" />
-                  </div>
+                 
+                <li>
+                  <NavLink
+                    end
+                    to="/admin/dashboard/about"
+                    className={({ isActive }) => 
+                      `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`
+                    }
+                  >
+                    <Settings className="w-5 h-5 mr-3" />
+                    <span className="text-sm font-medium">Settings</span>
+                  </NavLink>
                 </li>
               </ul>
             </nav>
