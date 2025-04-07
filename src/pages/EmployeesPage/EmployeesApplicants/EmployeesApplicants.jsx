@@ -9,12 +9,14 @@ import EmployeesHeader from "../../../Headers/EmployeesHeader";
 function EmployeesApplicants() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [applicants, setApplicants] = useState([]);
+  const [filteredApplicants, setFilteredApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const token = localStorage.getItem("authToken");
   const [showPopup, setShowPopup] = useState(false);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [applicantImages, setApplicantImages] = useState({});
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const showSuccessMessage = (message) => {
     Swal.fire({
@@ -43,6 +45,16 @@ function EmployeesApplicants() {
       return;
     }
 
+    // Get current user ID from localStorage
+    const storedUser = localStorage.getItem("userData");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      
+      
+      
+      setCurrentUserId(parsedUser.id);
+    }
+
     getData();
   }, [token]);
 
@@ -56,6 +68,19 @@ function EmployeesApplicants() {
       const applicantsData = response.data;
       setApplicants(applicantsData);
       
+        console.log(currentUserId);
+        
+      // Filter applicants based on current user ID
+      if (currentUserId) {
+        
+        const filtered = applicantsData.filter(applicant => 
+          applicant.userId === currentUserId
+        );
+        setFilteredApplicants(filtered);
+      } else {
+        setFilteredApplicants(applicantsData);
+      }
+
       // Fetch images for each applicant
       applicantsData.forEach(applicant => {
         if (applicant) {
@@ -69,6 +94,15 @@ function EmployeesApplicants() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (currentUserId && applicants.length > 0) {
+      const filtered = applicants.filter(applicant => 
+        applicant.userId === currentUserId
+      );
+      setFilteredApplicants(filtered);
+    }
+  }, [currentUserId, applicants]);
 
   const getApplicantImage = async (applicantId) => {
     try {
@@ -127,6 +161,7 @@ function EmployeesApplicants() {
         });
 
         setApplicants(prev => prev.filter(applicant => applicant.id !== applicantId));
+        setFilteredApplicants(prev => prev.filter(applicant => applicant.id !== applicantId));
         
         if (applicantImages[applicantId]) {
           URL.revokeObjectURL(applicantImages[applicantId]);
@@ -170,20 +205,6 @@ function EmployeesApplicants() {
     setSelectedApplicant(applicant);
     setShowPopup(true);
   };
-
-
-  function CheckApplicantsOwner(){
-    // const response = await instance.get("/job/searchJob/"+jobId, {
-    //   headers: { Authorization: `Bearer ${token}` },
-    //   }
-
-      const storedUser = localStorage.getItem("userData");
-      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-      const userId = parsedUser?.id;
-      console.log("user id : "+userId);
-      
-
-    }
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -296,13 +317,13 @@ function EmployeesApplicants() {
               {loading && <div className="text-center py-8">Loading applicants...</div>}
               {error && <div className="text-center py-8 text-red-500">{error}</div>}
 
-              {!loading && applicants.length === 0 ? (
+              {!loading && filteredApplicants.length === 0 ? (
                 <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
                   No applicants available at the moment.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {applicants.map((applicant) => (
+                  {filteredApplicants.map((applicant) => (
                     <div key={applicant.id} className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
                       <div className="p-4 flex items-start">
                         <img 
@@ -331,7 +352,7 @@ function EmployeesApplicants() {
                       
                       <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          {applicant.qualifications || 'N/A'}
+                          {applicant.jobTitle || 'N/A'}
                         </span>
                         <div className="flex gap-2">
                           <button
