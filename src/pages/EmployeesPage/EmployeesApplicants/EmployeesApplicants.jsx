@@ -46,7 +46,6 @@ function EmployeesApplicants() {
       return;
     }
 
-    // Get current user ID from localStorage
     const storedUser = localStorage.getItem("userData");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
@@ -66,7 +65,6 @@ function EmployeesApplicants() {
       const applicantsData = response.data;
       setApplicants(applicantsData);
       
-      // Filter applicants based on current user ID
       if (currentUserId) {
         const filtered = applicantsData.filter(applicant => 
           applicant.userId === currentUserId
@@ -76,7 +74,6 @@ function EmployeesApplicants() {
         setFilteredApplicants(applicantsData);
       }
 
-      // Fetch images for each applicant
       applicantsData.forEach(applicant => {
         if (applicant && applicant.id) {
           getApplicantImage(applicant.id);
@@ -169,7 +166,6 @@ function EmployeesApplicants() {
 
         showSuccessMessage('Applicant deleted successfully');
         
-        // Close the popup if it's open and showing the deleted applicant
         if (showPopup && selectedApplicant && selectedApplicant.id === applicantId) {
           setShowPopup(false);
           setSelectedApplicant(null);
@@ -236,7 +232,6 @@ function EmployeesApplicants() {
       });
   
       if (result.isConfirmed) {
-        // Find the applicant to accept
         const applicantToAccept = applicants.find(applicant => applicant && applicant.id === applicantId);
         console.log(applicantToAccept.id);
         console.log(applicantToAccept.username);
@@ -277,16 +272,13 @@ function EmployeesApplicants() {
           headers: { Authorization: `Bearer ${token}` },
         });
   
-        // Then delete the original application
         await instance.delete(`/job/deleteDocument/${applicantId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
-        // Update the state
         setApplicants(prev => prev.filter(applicant => applicant && applicant.id !== applicantId));
         setFilteredApplicants(prev => prev.filter(applicant => applicant && applicant.id !== applicantId));
         
-        // Clean up the image URL if it exists
         if (applicantImages[applicantId]) {
           URL.revokeObjectURL(applicantImages[applicantId]);
           setApplicantImages(prev => {
@@ -298,7 +290,6 @@ function EmployeesApplicants() {
   
         showSuccessMessage('Applicant accepted successfully');
         
-        // Close the popup if it's open
         if (showPopup && selectedApplicant && selectedApplicant.id === applicantId) {
           setShowPopup(false);
           setSelectedApplicant(null);

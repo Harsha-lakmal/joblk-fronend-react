@@ -116,7 +116,7 @@ function EmployeesJobPage() {
         })
           .then((response) => {
             showSuccessMessage("Job deleted successfully");
-            getData(); // Refresh the job list
+            getData(); 
           })
           .catch((error) => {
             setLoading(false);
@@ -153,7 +153,7 @@ function EmployeesJobPage() {
       .then((response) => {
         showSuccessMessage("Job updated successfully");
         setEditingJob(null);
-        getData(); // Refresh the job list
+        getData(); 
       })
       .catch((error) => {
         setLoading(false);
@@ -308,7 +308,6 @@ function EmployeesJobPage() {
               ) : (
                 jobs.map((job) => (
                   <div key={job.jobId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden flex flex-col hover:scale-[1.02] transition-transform duration-300 h-full">
-                    {/* Image with title overlay */}
                     <div className="relative h-48 w-full">
                       <img
                         src={jobsImages[job.jobId] || joblkimg}

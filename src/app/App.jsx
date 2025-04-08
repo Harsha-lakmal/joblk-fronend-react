@@ -36,17 +36,17 @@ function App() {
       <Route path="/signup" element={<LoginPage />} /> 
       <Route path="/sign" element={<SignPage />} />
       <Route path="/employees/dashboard/home" element={<EmployeesHome />} />
-      <Route path="/employees/dashboard/about" element={<EmployeesAbout />} />
+      <Route path="/employees/dashboard/settings" element={<EmployeesAbout />} />
       <Route path="/employees/dashboard/applicants" element={<EmployeesApplicants />} />
       <Route path="/employees/dashboard/job" element={<EmployeesJobPage />} />
       <Route path="/trainers/dashboard/home" element={<TrainersHome />} />
-      <Route path="/trainers/dashboard/about" element={<TrainersAbout />} />
+      <Route path="/trainers/dashboard/settings" element={<TrainersAbout />} />
       <Route path="/trainers/dashboard/course" element={<TrainersCourse />} />
       <Route path="/trainers/dashboard/applicants" element={<TrainersApplicants/>} />
       <Route path="/admin/dashboard/home" element={<AdminUserPage />} />
       <Route path="/admin/dashboard/job" element={<AdminJobPage />} />
       <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />  
-      <Route path="/admin/dashboard/about" element={<AdminAboutPage />} />    
+      <Route path="/admin/dashboard/settings" element={<AdminAboutPage />} />    
   
       <Route path="/error" element={<NotFoundPage />} />    
     </Routes>

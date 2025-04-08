@@ -42,7 +42,6 @@ function TrainersHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
     <header className={`sticky top-0 before:absolute before:inset-0 before:backdrop-blur-md max-lg:before:bg-white/90 dark:max-lg:before:bg-gray-800/90 before:-z-10 z-30 ${variant === 'v2' || variant === 'v3' ? 'before:bg-white after:absolute after:h-px after:inset-x-0 after:top-full after:bg-gray-200 dark:after:bg-gray-700/60 after:-z-10' : 'max-lg:shadow-xs lg:before:bg-gray-100/90 dark:lg:before:bg-gray-900/90'} ${variant === 'v2' ? 'dark:before:bg-gray-800' : ''} ${variant === 'v3' ? 'dark:before:bg-gray-900' : ''}`}>
       <div className="px-4 sm:px-6 lg:px-8">
         <div className={`flex items-center justify-between h-16 ${variant === 'v2' || variant === 'v3' ? '' : 'lg:border-b border-gray-200 dark:border-gray-700/60'}`}>
-          {/* Mobile menu button */}
           <div className="flex lg:hidden">
             <button
               id="mobile-nav-button"
@@ -67,12 +66,10 @@ function TrainersHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
             </button>
           </div>
 
-          {/* Mobile logo/brand */}
           <div className="lg:hidden flex items-center">
             <span className="text-lg font-semibold cursor-default">Joblk</span>
           </div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden lg:flex flex-1 justify-center">
             <ul className="flex space-x-1">
               <SidebarLinkGroup activecondition={location.pathname === "/trainers/dashboard/home"}>
@@ -116,15 +113,15 @@ function TrainersHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
               </SidebarLinkGroup>
 
            
-              <SidebarLinkGroup activecondition={location.pathname === "/trainers/dashboard/about"}>
+              <SidebarLinkGroup activecondition={location.pathname === "/trainers/dashboard/settings"}>
                 <NavLink
                   end
-                  to="/trainers/dashboard/about"
+                  to="/trainers/dashboard/settings"
                   className={({ isActive }) => 
                     `flex items-center px-4 py-2 rounded-lg transition-colors group ${isActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400'} cursor-pointer`
                   }
                 >
-                  <Settings className={`w-5 h-5 mr-2 ${location.pathname === "/trainers/dashboard/about" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
+                  <Settings className={`w-5 h-5 mr-2 ${location.pathname === "/trainers/dashboard/settings" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
                   <span className="text-sm font-medium">Settings</span>
                 </NavLink>
               </SidebarLinkGroup>
@@ -145,7 +142,6 @@ function TrainersHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
 
       
 
-        {/* Mobile Navigation */}
         {mobileNavOpen && (
           <div 
             id="mobile-nav"
@@ -193,7 +189,7 @@ function TrainersHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 <li>
                   <NavLink
                     end
-                    to="/trainers/dashboard/about"
+                    to="/trainers/dashboard/settings"
                     className={({ isActive }) => 
                       `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`
                     }

@@ -130,7 +130,6 @@ function EmployeesHome() {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <EmployeesHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        {/* Compact Popup Window */}
         {showPopup && selectedItem && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">
             <div className="flex justify-between items-center mb-3">
@@ -190,7 +189,6 @@ function EmployeesHome() {
               ) : (
                 jobs.map((job) => (
                   <div key={job.jobId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden flex flex-col hover:scale-[1.02] transition-transform duration-300 h-full">
-                    {/* Image with title overlay */}
                     <div className="relative h-48 w-full">
                       <img 
                         src={jobsImages[job.jobId] || joblkimg} 
@@ -210,7 +208,6 @@ function EmployeesHome() {
                       </button>
                     </div>
 
-                    {/* Job details */}
                     <div className="p-5 flex-grow">
                       <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
                         {job.jobDescription}
@@ -235,7 +232,6 @@ function EmployeesHome() {
                     </div>
 
                     <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                      {/* Additional actions can be placed here */}
                     </div>
                   </div>
                 ))

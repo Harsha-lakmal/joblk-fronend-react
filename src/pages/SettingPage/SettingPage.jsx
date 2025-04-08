@@ -8,7 +8,6 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
 const SettingPage = () => {
-  // State management
   const [coverImage, setCoverImage] = useState("/default-cover.jpg");
   const [profileImage, setProfileImage] = useState("/default-profile.jpg");
   const [loading, setLoading] = useState(false);
@@ -25,11 +24,9 @@ const SettingPage = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
-  // Refs
   const fileInputRef = useRef(null);
   const profileInputRef = useRef(null);
 
-  // Navigation and user data
   const navigate = useNavigate();
   const token = localStorage.getItem("authToken");
   const storedUser = localStorage.getItem("userData");
@@ -37,7 +34,6 @@ const SettingPage = () => {
   const userId = parsedUser?.id;
   const isAdmin = parsedUser?.role === "Admin";
 
-  // Initialize form with user data
   useEffect(() => {
     if (parsedUser) {
       setUsername(parsedUser.username || "");
@@ -45,17 +41,14 @@ const SettingPage = () => {
       setRole(parsedUser.role || "Employee");
     }
     
-    // Check for saved dark mode preference
     const savedMode = localStorage.getItem("darkMode") === "true";
     setDarkMode(savedMode);
     document.documentElement.classList.toggle("dark", savedMode);
     
-    // Check for saved notification preference
     const savedNotifications = localStorage.getItem("notificationsEnabled") !== "false";
     setNotificationsEnabled(savedNotifications);
   }, [parsedUser]);
 
-  // Notification helpers
   const showSuccessMessage = (msg = "Operation successful") => {
     Swal.fire({
       position: "top-end",
@@ -76,7 +69,6 @@ const SettingPage = () => {
     });
   };
 
-  // Image handling functions
   const handleCoverImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -217,7 +209,6 @@ const SettingPage = () => {
     }
   };
 
-  // Load images on mount
   useEffect(() => {
     if (userId && token) {
       getCoverImage();
@@ -233,7 +224,6 @@ const SettingPage = () => {
     };
   }, [userId, token]);
 
-  // Modal handlers
   const handleCloseModal = () => {
     setShowModal(false);
     setPasswordError("");
@@ -254,7 +244,6 @@ const SettingPage = () => {
     setPasswordError("");
   };
 
-  // Validation functions
   const validatePassword = () => {
     if (password && password.length < 6) {
       setPasswordError("Password must be at least 6 characters");
@@ -268,7 +257,6 @@ const SettingPage = () => {
     return true;
   };
 
-  // Update user function
   const updateUser = async () => {
     if (!username || !email) {
       showErrorMessage("Username and email are required");
@@ -307,7 +295,6 @@ const SettingPage = () => {
     setShowPassword(!showPassword);
   };
 
-  // New functions for additional features
   const handleSignOut = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -394,7 +381,6 @@ const SettingPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 relative">
-      {/* Cover Image Section */}
       <div className="mb-32 relative">
         {loading && !coverImage ? (
           <div className="w-full h-80 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
@@ -423,7 +409,6 @@ const SettingPage = () => {
         )}
       </div>
 
-      {/* Profile Image Section */}
       <div className="absolute top-64 left-1/2 transform -translate-x-1/2 z-10">
         {loading && !profileImage ? (
           <div className="w-40 h-40 bg-gray-200 dark:bg-gray-700 rounded-full border-4 border-white shadow-lg animate-pulse"></div>
@@ -452,7 +437,6 @@ const SettingPage = () => {
         )}
       </div>
 
-      {/* User Info Section */}
       <div className="text-center mt-20 mb-8">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
           {parsedUser?.username || "User"}
@@ -465,7 +449,6 @@ const SettingPage = () => {
         </span>
       </div>
 
-      {/* User Details Card */}
       <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 mx-auto max-w-md mb-8">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">
           Account Details
@@ -501,9 +484,7 @@ const SettingPage = () => {
         </div>
       </div>
 
-      {/* Additional Settings Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        {/* Sign Out Card */}
         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 transition-all hover:shadow-2xl hover:-translate-y-1">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 bg-red-100 dark:bg-red-900/50 rounded-full">
@@ -560,7 +541,6 @@ const SettingPage = () => {
           </button>
         </div>
 
-        {/* Delete Account Card */}
         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 transition-all hover:shadow-2xl hover:-translate-y-1">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 bg-rose-100 dark:bg-rose-900/50 rounded-full">
@@ -582,7 +562,6 @@ const SettingPage = () => {
           </button>
         </div>
 
-        {/* Sports Team Help Card */}
         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 transition-all hover:shadow-2xl hover:-translate-y-1">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 bg-green-100 dark:bg-green-900/50 rounded-full">
@@ -604,7 +583,6 @@ const SettingPage = () => {
           </button>
         </div>
 
-        {/* Notification Settings Card */}
         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 transition-all hover:shadow-2xl hover:-translate-y-1">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 bg-purple-100 dark:bg-purple-900/50 rounded-full">
@@ -642,7 +620,6 @@ const SettingPage = () => {
         </div>
       </div>
 
-      {/* Edit Profile Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
@@ -786,7 +763,6 @@ const SettingPage = () => {
         </div>
       )}
 
-      {/* Status Indicators */}
       {error && (
         <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in">
           {error}

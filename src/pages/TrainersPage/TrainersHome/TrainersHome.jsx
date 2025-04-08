@@ -53,7 +53,6 @@ function TrainersHome() {
     return () => clearInterval(interval);
   }, [token]);
 
-  // Courses related functions
   const getCoursesData = async () => {
     try {
       setLoading(true);
@@ -122,7 +121,6 @@ function TrainersHome() {
     }
   };
 
-  // Common functions
   const fetchUserDetails = async (userId) => {
     try {
       const response = await instance.get(`/user/getUserId/${userId}`, {
@@ -148,7 +146,6 @@ function TrainersHome() {
     }
   };
 
-  // Cleanup effects
   useEffect(() => {
     return () => {
       Object.values(courseImages).forEach(url => URL.revokeObjectURL(url));
@@ -160,7 +157,6 @@ function TrainersHome() {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <TrainersHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        {/* Compact Popup Window */}
         {showPopup && selectedItem && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">
             <div className="flex justify-between items-center mb-3">
@@ -221,7 +217,6 @@ function TrainersHome() {
               ) : (
                 courses.map((course) => (
                   <div key={course.courseId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden flex flex-col hover:scale-[1.02] transition-transform duration-300 h-full">
-                    {/* Image with title overlay */}
                     <div className="relative h-48 w-full">
                       <img 
                         src={courseImages[course.courseId] || joblkimg} 
@@ -241,7 +236,6 @@ function TrainersHome() {
                       </button>
                     </div>
 
-                    {/* Course details */}
                     <div className="p-5 flex-grow">
                       <ul className="space-y-2 text-sm">
                         <li className="flex items-start">
@@ -268,7 +262,6 @@ function TrainersHome() {
                     </div>
 
                     <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                      {/* Additional buttons or information can go here */}
                     </div>
                   </div>
                 ))
