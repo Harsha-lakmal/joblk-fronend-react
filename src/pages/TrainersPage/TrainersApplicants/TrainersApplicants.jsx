@@ -3,8 +3,9 @@ import joblkimg from "../../../Assets/joblk.png";
 import Banner from "../../../comon/Banner/Banner";
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
 import Swal from "sweetalert2";
-import { CircleUserRound, X, Download, FileText, Trash2 } from 'lucide-react';
+import { CircleUserRound, X, Download, FileText, Trash2, Check } from 'lucide-react';
 import TrainersHeader from "../../../Headers/TrainersHeader";
+
 function TrainersApplicants() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [applicants, setApplicants] = useState([]);
@@ -16,6 +17,7 @@ function TrainersApplicants() {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [applicantImages, setApplicantImages] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [showAccepted, setShowAccepted] = useState(false);
 
   const showSuccessMessage = (message) => {
     Swal.fire({
@@ -44,7 +46,6 @@ function TrainersApplicants() {
       return;
     }
 
-    // Get current user ID from localStorage
     const storedUser = localStorage.getItem("userData");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
@@ -64,9 +65,6 @@ function TrainersApplicants() {
       const applicantsData = response.data;
       setApplicants(applicantsData);
       
-      console.log(currentUserId);
-        
-      // Filter applicants based on current user ID
       if (currentUserId) {
         const filtered = applicantsData.filter(applicant => 
           applicant.userId === currentUserId
@@ -76,7 +74,6 @@ function TrainersApplicants() {
         setFilteredApplicants(applicantsData);
       }
 
-      // Fetch images for each applicant
       applicantsData.forEach(applicant => {
         if (applicant) {
           getApplicantImage(applicant.id);
@@ -138,6 +135,79 @@ function TrainersApplicants() {
     }
   };
 
+  const acceptDocument = async (applicantId) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Accept Applicant?',
+        text: "This will approve the applicant for the course and remove them from the pending list.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, accept!'
+      });
+  
+      if (result.isConfirmed) {
+        // Find the applicant to accept
+        const applicantToAccept = applicants.find(applicant => applicant.id === applicantId);
+        
+        if (!applicantToAccept) {
+          throw new Error('Applicant not found');
+        }
+  
+        // Create the AcceptCourse object with data from the applicant
+        const acceptCourseData = {
+          courseDocumentId: applicantToAccept.id,
+          username: applicantToAccept.username,
+          qualifications: applicantToAccept.qualifications,
+          age: applicantToAccept.age,
+          gender: applicantToAccept.gender,
+          applyDate: applicantToAccept.applyDate,
+          userEmail: applicantToAccept.userEmail,
+          number: applicantToAccept.number,
+          address: applicantToAccept.address,
+          courseId: applicantToAccept.courseId,
+          userId: applicantToAccept.userId,
+          courseTitle: applicantToAccept.courseTitle,
+        };
+  
+        // First save the accepted applicant to the accepted list
+        await instance.post(`/course/saveAcceptDocument`, acceptCourseData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        // Then delete the original application
+        await instance.delete(`/course/deleteDocumentCourse/${applicantId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        // Update the state
+        setApplicants(prev => prev.filter(applicant => applicant.id !== applicantId));
+        setFilteredApplicants(prev => prev.filter(applicant => applicant.id !== applicantId));
+        
+        // Clean up the image URL if it exists
+        if (applicantImages[applicantId]) {
+          URL.revokeObjectURL(applicantImages[applicantId]);
+          setApplicantImages(prev => {
+            const newImages = {...prev};
+            delete newImages[applicantId];
+            return newImages;
+          });
+        }
+  
+        showSuccessMessage('Applicant accepted successfully');
+        
+        // Close the popup if it's open
+        if (showPopup && selectedApplicant && selectedApplicant.id === applicantId) {
+          setShowPopup(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error accepting document:', error);
+      showErrorMessage("Failed to accept applicant");
+    }
+  };
+
   const deleteDocument = async (applicantId) => {
     try {
       const result = await Swal.fire({
@@ -168,6 +238,11 @@ function TrainersApplicants() {
         }
 
         showSuccessMessage('Applicant deleted successfully');
+        
+        // Close the popup if the deleted applicant was being viewed
+        if (showPopup && selectedApplicant && selectedApplicant.id === applicantId) {
+          setShowPopup(false);
+        }
       }
     } catch (error) {
       console.error('Error deleting document:', error);
@@ -206,6 +281,16 @@ function TrainersApplicants() {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  // Toggle function to show/hide accepted applicants
+  const toggleShowAccepted = () => {
+    setShowAccepted(prev => !prev);
+  };
+
+  // Filter applicants based on the showAccepted state
+  const displayedApplicants = showAccepted 
+    ? filteredApplicants 
+    : filteredApplicants.filter(app => app.status !== 'ACCEPTED');
 
   useEffect(() => {
     return () => {
@@ -248,6 +333,11 @@ function TrainersApplicants() {
                 <div>
                   <h4 className="font-bold text-lg">{selectedApplicant.username || 'N/A'}</h4>
                   <p className="text-gray-600 dark:text-gray-300">{selectedApplicant.userEmail || 'N/A'}</p>
+                  {selectedApplicant.status === 'ACCEPTED' && (
+                    <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                      Accepted
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -279,13 +369,15 @@ function TrainersApplicants() {
               </div>
 
               <div className="flex gap-2">
-                <button
-                  onClick={() => handleDownloadCV(selectedApplicant.id)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition"
-                >
-                  <Download size={16} />
-                  Download CV
-                </button>
+                {selectedApplicant.status !== 'ACCEPTED' && (
+                  <button
+                    onClick={() => acceptDocument(selectedApplicant.id)}
+                    className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition"
+                  >
+                    <Check size={16} />
+                    Accept
+                  </button>
+                )}
                 <button
                   onClick={() => deleteDocument(selectedApplicant.id)}
                   className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition"
@@ -306,19 +398,33 @@ function TrainersApplicants() {
                   Course Applicants
                 </h1>
               </div>
+              
+              {/* Toggle to show/hide accepted applicants */}
+              <div>
+                <button 
+                  onClick={toggleShowAccepted}
+                  className={`px-4 py-2 rounded-md transition-colors ${
+                    showAccepted 
+                      ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                      : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                  }`}
+                >
+                  {showAccepted ? 'Hide Accepted' : 'Show Accepted'}
+                </button>
+              </div>
             </div>
 
             <div>
               {loading && <div className="text-center py-8">Loading applicants...</div>}
               {error && <div className="text-center py-8 text-red-500">{error}</div>}
 
-              {!loading && filteredApplicants.length === 0 ? (
+              {!loading && displayedApplicants.length === 0 ? (
                 <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
-                  No course applicants available at the moment.
+                  {showAccepted ? 'No course applicants available at the moment.' : 'No pending course applicants available.'}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredApplicants.map((applicant) => (
+                  {displayedApplicants.map((applicant) => (
                     <div key={applicant.id} className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
                       <div className="p-4 flex items-start">
                         <img 
@@ -335,6 +441,11 @@ function TrainersApplicants() {
                           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                             Applied on: {formatDate(applicant.applyDate)}
                           </p>
+                          {applicant.status === 'ACCEPTED' && (
+                            <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mt-1">
+                              Accepted
+                            </span>
+                          )}
                         </div>
                         <button 
                           onClick={() => handleViewDetails(applicant)}
@@ -347,17 +458,18 @@ function TrainersApplicants() {
                       
                       <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          {applicant.courseName || 'N/A'}
+                          {applicant.courseTitle || 'N/A'}
                         </span>
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => handleDownloadCV(applicant.id)}
-                            className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition"
-                            title="Download CV"
-                          >
-                            <FileText size={16} />
-                            CV
-                          </button>
+                          {applicant.status !== 'ACCEPTED' && (
+                            <button
+                              onClick={() => acceptDocument(applicant.id)}
+                              className="flex items-center gap-1 text-sm text-green-500 hover:text-green-600 dark:hover:text-green-400 transition"
+                              title="Accept applicant"
+                            >
+                              <Check size={16} />
+                            </button>
+                          )}
                           <button
                             onClick={() => deleteDocument(applicant.id)}
                             className="flex items-center gap-1 text-sm text-red-500 hover:text-red-600 dark:hover:text-red-400 transition"
