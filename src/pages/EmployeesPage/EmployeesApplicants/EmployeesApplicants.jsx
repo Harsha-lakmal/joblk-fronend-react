@@ -3,7 +3,8 @@ import joblkimg from "../../../Assets/joblk.png";
 import Banner from "../../../comon/Banner/Banner";
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
 import Swal from "sweetalert2";
-import { CircleUserRound, X, Download, FileText, Trash2 } from 'lucide-react';
+import { CircleUserRound, X, Download, FileText, Trash2, Check } from 'lucide-react';
+
 import EmployeesHeader from "../../../Headers/EmployeesHeader";
 
 function EmployeesApplicants() {
@@ -49,9 +50,6 @@ function EmployeesApplicants() {
     const storedUser = localStorage.getItem("userData");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      
-      
-      
       setCurrentUserId(parsedUser.id);
     }
 
@@ -68,11 +66,8 @@ function EmployeesApplicants() {
       const applicantsData = response.data;
       setApplicants(applicantsData);
       
-        console.log(currentUserId);
-        
       // Filter applicants based on current user ID
       if (currentUserId) {
-        
         const filtered = applicantsData.filter(applicant => 
           applicant.userId === currentUserId
         );
@@ -83,7 +78,7 @@ function EmployeesApplicants() {
 
       // Fetch images for each applicant
       applicantsData.forEach(applicant => {
-        if (applicant) {
+        if (applicant && applicant.id) {
           getApplicantImage(applicant.id);
         }
       });
@@ -98,7 +93,7 @@ function EmployeesApplicants() {
   useEffect(() => {
     if (currentUserId && applicants.length > 0) {
       const filtered = applicants.filter(applicant => 
-        applicant.userId === currentUserId
+        applicant && applicant.userId === currentUserId
       );
       setFilteredApplicants(filtered);
     }
@@ -160,8 +155,8 @@ function EmployeesApplicants() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setApplicants(prev => prev.filter(applicant => applicant.id !== applicantId));
-        setFilteredApplicants(prev => prev.filter(applicant => applicant.id !== applicantId));
+        setApplicants(prev => prev.filter(applicant => applicant && applicant.id !== applicantId));
+        setFilteredApplicants(prev => prev.filter(applicant => applicant && applicant.id !== applicantId));
         
         if (applicantImages[applicantId]) {
           URL.revokeObjectURL(applicantImages[applicantId]);
@@ -173,6 +168,12 @@ function EmployeesApplicants() {
         }
 
         showSuccessMessage('Applicant deleted successfully');
+        
+        // Close the popup if it's open and showing the deleted applicant
+        if (showPopup && selectedApplicant && selectedApplicant.id === applicantId) {
+          setShowPopup(false);
+          setSelectedApplicant(null);
+        }
       }
     } catch (error) {
       console.error('Error deleting document:', error);
@@ -222,6 +223,93 @@ function EmployeesApplicants() {
     };
   }, [applicantImages]);
 
+  const acceptDocument = async (applicantId) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Accept Applicant?',
+        text: "This will approve the applicant for the Job and remove them from the pending list.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, accept!'
+      });
+  
+      if (result.isConfirmed) {
+        // Find the applicant to accept
+        const applicantToAccept = applicants.find(applicant => applicant && applicant.id === applicantId);
+        console.log(applicantToAccept.id);
+        console.log(applicantToAccept.username);
+        console.log(applicantToAccept.qualifications);
+        console.log(applicantToAccept.age);
+        console.log(applicantToAccept.gender);
+        console.log(applicantToAccept.applyDate);
+        console.log(applicantToAccept.userEmail);
+        console.log(applicantToAccept.number);
+        console.log(applicantToAccept.address);
+        console.log(applicantToAccept.jobId);
+        console.log(applicantToAccept.userId);
+        console.log(applicantToAccept.jobTitle);
+
+
+        
+        
+        if (!applicantToAccept) {
+          throw new Error('Applicant not found');
+        }
+  
+        const acceptJobseData = {
+          jobDocumentId: applicantToAccept.id,
+          username: applicantToAccept.username,
+          qualifications: applicantToAccept.qualifications,
+          age: applicantToAccept.age,
+          gender: applicantToAccept.gender,
+          applyDate: applicantToAccept.applyDate,
+          userEmail: applicantToAccept.userEmail,
+          number: applicantToAccept.number,
+          address: applicantToAccept.address,
+          jobId: applicantToAccept.jobId,
+          userId: applicantToAccept.userId,
+          jobTitle: applicantToAccept.jobTitle,
+        };
+  
+        await instance.post(`/job/saveAcceptDocumentJob`, acceptJobseData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        // Then delete the original application
+        await instance.delete(`/job/deleteDocument/${applicantId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        // Update the state
+        setApplicants(prev => prev.filter(applicant => applicant && applicant.id !== applicantId));
+        setFilteredApplicants(prev => prev.filter(applicant => applicant && applicant.id !== applicantId));
+        
+        // Clean up the image URL if it exists
+        if (applicantImages[applicantId]) {
+          URL.revokeObjectURL(applicantImages[applicantId]);
+          setApplicantImages(prev => {
+            const newImages = {...prev};
+            delete newImages[applicantId];
+            return newImages;
+          });
+        }
+  
+        showSuccessMessage('Applicant accepted successfully');
+        
+        // Close the popup if it's open
+        if (showPopup && selectedApplicant && selectedApplicant.id === applicantId) {
+          setShowPopup(false);
+          setSelectedApplicant(null);
+        }
+      }
+    } catch (error) {
+      console.error('Error accepting document:', error);
+      showErrorMessage("Failed to accept applicant");
+    }
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -242,8 +330,9 @@ function EmployeesApplicants() {
             <div className="space-y-4">
               <div className="flex items-center">
                 <img 
-                  src={selectedApplicant && selectedApplicant.id && applicantImages[selectedApplicant.id] ? 
-                      applicantImages[selectedApplicant.id] : joblkimg} 
+                  src={selectedApplicant && selectedApplicant.id && applicantImages[selectedApplicant.id] 
+                    ? applicantImages[selectedApplicant.id] 
+                    : joblkimg} 
                   alt="Applicant" 
                   className="w-16 h-16 rounded-full object-cover mr-4"
                   onError={(e) => {
@@ -284,6 +373,15 @@ function EmployeesApplicants() {
               </div>
 
               <div className="flex gap-2">
+                {selectedApplicant.status !== 'ACCEPTED' && (
+                  <button
+                    onClick={() => acceptDocument(selectedApplicant.id)}
+                    className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition"
+                  >
+                    <Check size={16} />
+                    Accept
+                  </button>
+                )}
                 <button
                   onClick={() => handleDownloadCV(selectedApplicant.id)}
                   className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition"
@@ -324,55 +422,66 @@ function EmployeesApplicants() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredApplicants.map((applicant) => (
-                    <div key={applicant.id} className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                      <div className="p-4 flex items-start">
-                        <img 
-                          src={applicantImages[applicant.id] || joblkimg} 
-                          alt="Applicant" 
-                          className="w-16 h-16 rounded-full object-cover mr-4"
-                          onError={(e) => {
-                            e.target.src = joblkimg;
-                          }}
-                        />
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg">{applicant.username || 'N/A'}</h3>
-                          <p className="text-gray-600 dark:text-gray-300 text-sm">{applicant.userEmail || 'N/A'}</p>
-                          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                            Applied on: {formatDate(applicant.applyDate)}
-                          </p>
-                        </div>
-                        <button 
-                          onClick={() => handleViewDetails(applicant)}
-                          className="text-gray-500 hover:text-blue-500 transition"
-                          title="View details"
-                        >
-                          <CircleUserRound size={20} />
-                        </button>
-                      </div>
-                      
-                      <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex justify-between items-center">
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          {applicant.courseTitle || 'N/A'}
-                        </span>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleDownloadCV(applicant.id)}
-                            className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition"
-                            title="Download CV"
+                    applicant && (
+                      <div key={applicant.id} className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div className="p-4 flex items-start">
+                          <img 
+                            src={applicant.id && applicantImages[applicant.id] ? applicantImages[applicant.id] : joblkimg} 
+                            alt="Applicant" 
+                            className="w-16 h-16 rounded-full object-cover mr-4"
+                            onError={(e) => {
+                              e.target.src = joblkimg;
+                            }}
+                          />
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg">{applicant.username || 'N/A'}</h3>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">{applicant.userEmail || 'N/A'}</p>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                              Applied on: {formatDate(applicant.applyDate)}
+                            </p>
+                          </div>
+                          <button 
+                            onClick={() => handleViewDetails(applicant)}
+                            className="text-gray-500 hover:text-blue-500 transition"
+                            title="View details"
                           >
-                            <FileText size={16} />
-                            CV
-                          </button>
-                          <button
-                            onClick={() => deleteDocument(applicant.id)}
-                            className="flex items-center gap-1 text-sm text-red-500 hover:text-red-600 dark:hover:text-red-400 transition"
-                            title="Delete applicant"
-                          >
-                            <Trash2 size={16} />
+                            <CircleUserRound size={20} />
                           </button>
                         </div>
+                        
+                        <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex justify-between items-center">
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            {applicant.jobTitle || 'N/A'}
+                          </span>
+                          <div className="flex gap-2">
+                            {applicant.status !== 'ACCEPTED' && (
+                              <button
+                                onClick={() => acceptDocument(applicant.id)}
+                                className="flex items-center gap-1 text-sm text-green-500 hover:text-green-600 dark:hover:text-green-400 transition"
+                                title="Accept applicant"
+                              >
+                                <Check size={16} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDownloadCV(applicant.id)}
+                              className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition"
+                              title="Download CV"
+                            >
+                              <FileText size={16} />
+                              CV
+                            </button>
+                            <button
+                              onClick={() => deleteDocument(applicant.id)}
+                              className="flex items-center gap-1 text-sm text-red-500 hover:text-red-600 dark:hover:text-red-400 transition"
+                              title="Delete applicant"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )
                   ))}
                 </div>
               )}

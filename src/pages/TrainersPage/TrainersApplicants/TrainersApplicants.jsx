@@ -148,14 +148,12 @@ function TrainersApplicants() {
       });
   
       if (result.isConfirmed) {
-        // Find the applicant to accept
         const applicantToAccept = applicants.find(applicant => applicant.id === applicantId);
         
         if (!applicantToAccept) {
           throw new Error('Applicant not found');
         }
   
-        // Create the AcceptCourse object with data from the applicant
         const acceptCourseData = {
           courseDocumentId: applicantToAccept.id,
           username: applicantToAccept.username,
@@ -171,21 +169,17 @@ function TrainersApplicants() {
           courseTitle: applicantToAccept.courseTitle,
         };
   
-        // First save the accepted applicant to the accepted list
         await instance.post(`/course/saveAcceptDocument`, acceptCourseData, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
-        // Then delete the original application
         await instance.delete(`/course/deleteDocumentCourse/${applicantId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
-        // Update the state
         setApplicants(prev => prev.filter(applicant => applicant.id !== applicantId));
         setFilteredApplicants(prev => prev.filter(applicant => applicant.id !== applicantId));
         
-        // Clean up the image URL if it exists
         if (applicantImages[applicantId]) {
           URL.revokeObjectURL(applicantImages[applicantId]);
           setApplicantImages(prev => {
@@ -197,7 +191,6 @@ function TrainersApplicants() {
   
         showSuccessMessage('Applicant accepted successfully');
         
-        // Close the popup if it's open
         if (showPopup && selectedApplicant && selectedApplicant.id === applicantId) {
           setShowPopup(false);
         }
@@ -239,7 +232,6 @@ function TrainersApplicants() {
 
         showSuccessMessage('Applicant deleted successfully');
         
-        // Close the popup if the deleted applicant was being viewed
         if (showPopup && selectedApplicant && selectedApplicant.id === applicantId) {
           setShowPopup(false);
         }
@@ -282,12 +274,10 @@ function TrainersApplicants() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Toggle function to show/hide accepted applicants
   const toggleShowAccepted = () => {
     setShowAccepted(prev => !prev);
   };
 
-  // Filter applicants based on the showAccepted state
   const displayedApplicants = showAccepted 
     ? filteredApplicants 
     : filteredApplicants.filter(app => app.status !== 'ACCEPTED');
@@ -399,7 +389,6 @@ function TrainersApplicants() {
                 </h1>
               </div>
               
-              {/* Toggle to show/hide accepted applicants */}
               <div>
                 <button 
                   onClick={toggleShowAccepted}
