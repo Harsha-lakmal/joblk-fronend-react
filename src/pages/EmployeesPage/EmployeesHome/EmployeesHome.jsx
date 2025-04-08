@@ -177,7 +177,7 @@ function EmployeesHome() {
 
         <main className="grow">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6">Job Opportunities</h1>
+            <h1 className="text-2xl font-bold mb-6" style={{color :"#6495ED"}}  >Job Post</h1>
 
             {error && <div className="text-center py-4 text-red-500">{error}</div>}
             {loading && <div className="text-center py-4">Loading...</div>}

@@ -87,16 +87,16 @@ function TrainersHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                   <span className="text-sm font-medium">Home</span>
                 </NavLink>
               </SidebarLinkGroup>
-              <SidebarLinkGroup activecondition={location.pathname === "/trainers/dashboard/document"}>
+              <SidebarLinkGroup activecondition={location.pathname === "/trainers/dashboard/applicants"}>
                 <NavLink
                   end
-                  to="/trainers/dashboard/document"
+                  to="/trainers/dashboard/applicants"
                   className={({ isActive }) => 
                     `flex items-center px-4 py-2 rounded-lg transition-colors group ${isActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400'} cursor-pointer`
                   }
                 >
-                  <FileCheck className={`w-5 h-5 mr-2 ${location.pathname === "/trainers/dashboard/document" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
-                  <span className="text-sm font-medium">Document</span>
+                  <FileCheck className={`w-5 h-5 mr-2 ${location.pathname === "/trainers/dashboard/applicants" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
+                  <span className="text-sm font-medium">Applicants</span>
                 </NavLink>
               </SidebarLinkGroup>
 
@@ -181,13 +181,13 @@ function TrainersHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 <li>
                   <NavLink
                     end
-                    to="/trainers/dashboard/document"
+                    to="/trainers/dashboard/applicants"
                     className={({ isActive }) => 
                       `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`
                     }
                   >
                     <FileCheck className="w-5 h-5 mr-3" />
-                    <span className="text-sm font-medium">Document</span>
+                    <span className="text-sm font-medium">Applicants</span>
                   </NavLink>
                 </li>
                 <li>

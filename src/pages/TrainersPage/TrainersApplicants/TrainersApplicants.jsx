@@ -4,9 +4,8 @@ import Banner from "../../../comon/Banner/Banner";
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
 import Swal from "sweetalert2";
 import { CircleUserRound, X, Download, FileText, Trash2 } from 'lucide-react';
-import EmployeesHeader from "../../../Headers/EmployeesHeader";
-
-function EmployeesApplicants() {
+import TrainersHeader from "../../../Headers/TrainersHeader";
+function TrainersApplicants() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [applicants, setApplicants] = useState([]);
   const [filteredApplicants, setFilteredApplicants] = useState([]);
@@ -49,9 +48,6 @@ function EmployeesApplicants() {
     const storedUser = localStorage.getItem("userData");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      
-      
-      
       setCurrentUserId(parsedUser.id);
     }
 
@@ -61,18 +57,17 @@ function EmployeesApplicants() {
   const getData = async () => {
     try {
       setLoading(true);
-      const response = await instance.get("/job/getAllJobDocuments", {
+      const response = await instance.get("/course/getAllCourseDocuments", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const applicantsData = response.data;
       setApplicants(applicantsData);
       
-        console.log(currentUserId);
+      console.log(currentUserId);
         
       // Filter applicants based on current user ID
       if (currentUserId) {
-        
         const filtered = applicantsData.filter(applicant => 
           applicant.userId === currentUserId
         );
@@ -90,7 +85,7 @@ function EmployeesApplicants() {
 
       setLoading(false);
     } catch (error) {
-      setError("Failed to load applicants.");
+      setError("Failed to load course applicants.");
       setLoading(false);
     }
   };
@@ -106,7 +101,7 @@ function EmployeesApplicants() {
 
   const getApplicantImage = async (applicantId) => {
     try {
-      const response = await instance.get(`/job/getDocumentImage/${applicantId}`, {
+      const response = await instance.get(`/course/getDocumentImageCourse/${applicantId}`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob'
       });
@@ -127,7 +122,7 @@ function EmployeesApplicants() {
 
   const getCvDocument = async (applicantId) => {
     try {
-      const response = await instance.get(`/job/getCvDocument/${applicantId}`, {
+      const response = await instance.get(`/course/getCvDocumentCourse/${applicantId}`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob'
       });
@@ -156,7 +151,7 @@ function EmployeesApplicants() {
       });
 
       if (result.isConfirmed) {
-        await instance.delete(`/job/deleteDocument/${applicantId}`, {
+        await instance.delete(`/course/deleteDocumentCourse/${applicantId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -225,12 +220,12 @@ function EmployeesApplicants() {
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <EmployeesHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <TrainersHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         
         {showPopup && selectedApplicant && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-96 max-w-full">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-xl">Applicant Details</h3>
+              <h3 className="font-semibold text-xl">Course Applicant Details</h3>
               <button 
                 onClick={() => setShowPopup(false)} 
                 className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -308,7 +303,7 @@ function EmployeesApplicants() {
             <div className="sm:flex sm:justify-between sm:items-center mb-8">
               <div className="mb-4 sm:mb-0">
                 <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{ color: "#6495ED" }}>
-                  Job Applicants
+                  Course Applicants
                 </h1>
               </div>
             </div>
@@ -319,7 +314,7 @@ function EmployeesApplicants() {
 
               {!loading && filteredApplicants.length === 0 ? (
                 <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
-                  No applicants available at the moment.
+                  No course applicants available at the moment.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -352,7 +347,7 @@ function EmployeesApplicants() {
                       
                       <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          {applicant.courseTitle || 'N/A'}
+                          {applicant.courseName || 'N/A'}
                         </span>
                         <div className="flex gap-2">
                           <button
@@ -386,4 +381,4 @@ function EmployeesApplicants() {
   );
 }
 
-export default EmployeesApplicants;
+export default TrainersApplicants;
