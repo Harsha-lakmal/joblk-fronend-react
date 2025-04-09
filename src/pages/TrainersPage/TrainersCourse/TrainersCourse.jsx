@@ -87,23 +87,28 @@ function TrainersCourse() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const fetchedCourses = response.data;
+      // Ensure we always have an array
+      const fetchedCourses = Array.isArray(response?.data) ? response.data : [];
       setCourses(fetchedCourses);
 
       fetchedCourses.forEach((course) => {
-        if (!courseImages[course.courseId]) {
+        if (course.courseId && !courseImages[course.courseId]) {
           getCourseImage(course.courseId);
         }
-        setUploadDates(prev => ({
-          ...prev,
-          [course.courseId]: course.dateUpload ? new Date(course.dateUpload).toLocaleDateString() : 'N/A'
-        }));
+        if (course.courseId) {
+          setUploadDates(prev => ({
+            ...prev,
+            [course.courseId]: course.dateUpload ? new Date(course.dateUpload).toLocaleDateString() : 'N/A'
+          }));
+        }
       });
 
       setLoading(false);
     } catch (error) {
       setError("Failed to load courses.");
+      setCourses([]); // Reset to empty array on error
       setLoading(false);
+      console.error("Error fetching courses:", error);
     }
   };
 
@@ -178,6 +183,11 @@ function TrainersCourse() {
       }));
     } catch (err) {
       console.error("Error fetching course image:", err);
+      // Set default image if error occurs
+      setCourseImages((prevImages) => ({
+        ...prevImages,
+        [courseId]: joblkimg,
+      }));
     }
   };
 
@@ -190,17 +200,19 @@ function TrainersCourse() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const newCourses = response.data;
+      const newCourses = Array.isArray(response?.data) ? response.data : [];
       if (JSON.stringify(newCourses) !== JSON.stringify(courses)) {
         setCourses(newCourses);
         newCourses.forEach((course) => {
-          if (!courseImages[course.courseId]) {
+          if (course.courseId && !courseImages[course.courseId]) {
             getCourseImage(course.courseId);
           }
-          setUploadDates(prev => ({
-            ...prev,
-            [course.courseId]: course.dateUpload ? new Date(course.dateUpload).toLocaleDateString() : 'N/A'
-          }));
+          if (course.courseId) {
+            setUploadDates(prev => ({
+              ...prev,
+              [course.courseId]: course.dateUpload ? new Date(course.dateUpload).toLocaleDateString() : 'N/A'
+            }));
+          }
         });
       }
     } catch (error) {
@@ -235,16 +247,22 @@ function TrainersCourse() {
 
   const handleCourseAdded = (newCourse) => {
     setCourses(prev => [...prev, newCourse]);
-    getCourseImage(newCourse.courseId);
-    setUploadDates(prev => ({
-      ...prev,
-      [newCourse.courseId]: newCourse.dateUpload ? new Date(newCourse.dateUpload).toLocaleDateString() : 'N/A'
-    }));
+    if (newCourse.courseId) {
+      getCourseImage(newCourse.courseId);
+      setUploadDates(prev => ({
+        ...prev,
+        [newCourse.courseId]: newCourse.dateUpload ? new Date(newCourse.dateUpload).toLocaleDateString() : 'N/A'
+      }));
+    }
   };
 
   useEffect(() => {
     return () => {
-      Object.values(courseImages).forEach(url => URL.revokeObjectURL(url));
+      Object.values(courseImages).forEach(url => {
+        if (url && typeof url === 'string' && url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
     };
   }, [courseImages]);
 
@@ -280,7 +298,7 @@ function TrainersCourse() {
               </div>
               <div className="flex items-center">
                 <span className="font-medium w-20">Upload Date:</span>
-                <span className="truncate">{uploadDates[selectedCourse.courseId] || 'N/A'}</span>
+                <span className="truncate">{selectedCourse.courseId ? uploadDates[selectedCourse.courseId] || 'N/A' : 'N/A'}</span>
               </div>
             </div>
 
@@ -315,7 +333,7 @@ function TrainersCourse() {
                   <input
                     type="text"
                     name="courseTitle"
-                    value={editingCourse.courseTitle}
+                    value={editingCourse.courseTitle || ''}
                     onChange={handleEditChange}
                     className="w-full px-4 py-2 border rounded-lg"
                   />
@@ -324,7 +342,7 @@ function TrainersCourse() {
                   <label className="block mb-2 text-sm font-medium">Description</label>
                   <textarea
                     name="courseDescription"
-                    value={editingCourse.courseDescription}
+                    value={editingCourse.courseDescription || ''}
                     onChange={handleEditChange}
                     className="w-full px-4 py-2 border rounded-lg"
                     rows="3"
@@ -334,7 +352,7 @@ function TrainersCourse() {
                   <label className="block mb-2 text-sm font-medium">Content</label>
                   <textarea
                     name="courseContent"
-                    value={editingCourse.courseContent}
+                    value={editingCourse.courseContent || ''}
                     onChange={handleEditChange}
                     className="w-full px-4 py-2 border rounded-lg"
                     rows="3"
@@ -345,7 +363,7 @@ function TrainersCourse() {
                   <input
                     type="text"
                     name="courseQualification"
-                    value={editingCourse.courseQualification}
+                    value={editingCourse.courseQualification || ''}
                     onChange={handleEditChange}
                     className="w-full px-4 py-2 border rounded-lg"
                   />
@@ -355,7 +373,7 @@ function TrainersCourse() {
                   <input
                     type="text"
                     name="courseStartDate"
-                    value={editingCourse.courseStartDate}
+                    value={editingCourse.courseStartDate || ''}
                     onChange={handleEditChange}
                     className="w-full px-4 py-2 border rounded-lg"
                   />
@@ -365,7 +383,7 @@ function TrainersCourse() {
                   <input
                     type="text"
                     name="courseLocation"
-                    value={editingCourse.courseLocation}
+                    value={editingCourse.courseLocation || ''}
                     onChange={handleEditChange}
                     className="w-full px-4 py-2 border rounded-lg"
                   />
@@ -395,7 +413,7 @@ function TrainersCourse() {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{ color: "#6495ED" }}>
-                Your Post for View
+                  Your Post for View
                 </h1>
               </div>
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
@@ -408,23 +426,26 @@ function TrainersCourse() {
                 {loading && <div className="text-center col-span-full">Loading courses...</div>}
                 {error && <div className="text-center col-span-full text-red-500">{error}</div>}
 
-                {courses.length === 0 && !loading && (
+                {!loading && !error && courses.length === 0 && (
                   <div className="col-span-full text-center py-4 text-gray-500 dark:text-gray-400">
                     No courses available at the moment.
                   </div>
                 )}
 
-                {courses.map((course) => (
-                  <div key={course.courseId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden flex flex-col hover:scale-[1.02] transition-transform duration-300 h-full">
+                {Array.isArray(courses) && courses.map((course) => (
+                  <div key={course.courseId || Math.random()} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden flex flex-col hover:scale-[1.02] transition-transform duration-300 h-full">
                     <div className="relative h-48 w-full">
                       <img 
                         src={courseImages[course.courseId] || joblkimg} 
                         alt="Course" 
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = joblkimg;
+                        }}
                       />
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
                         <h2 className="text-xl font-semibold text-white line-clamp-1">
-                          {course.courseTitle}
+                          {course.courseTitle || 'Untitled Course'}
                         </h2>
                       </div>
                       <button 
@@ -439,30 +460,30 @@ function TrainersCourse() {
                       <ul className="space-y-3 text-sm">
                         <li className="flex items-start">
                           <span className="font-medium min-w-[100px]">Description:</span>
-                          <span className="flex-1 line-clamp-3">{course.courseDescription}</span>
+                          <span className="flex-1 line-clamp-3">{course.courseDescription || 'No description'}</span>
                         </li>
                         <li className="flex items-start">
                           <span className="font-medium min-w-[100px]">Content:</span>
-                          <span className="flex-1 line-clamp-3">{course.courseContent}</span>
+                          <span className="flex-1 line-clamp-3">{course.courseContent || 'No content'}</span>
                         </li>
                         <li className="flex items-start">
                           <span className="font-medium min-w-[100px]">Qualifications:</span>
-                          <span className="flex-1 line-clamp-3">{course.courseQualification}</span>
+                          <span className="flex-1 line-clamp-3">{course.courseQualification || 'No qualifications specified'}</span>
                         </li>
                         <li className="flex items-start">
                           <span className="font-medium min-w-[100px]">Start Date:</span>
-                          <span className="flex-1">{course.courseStartDate}</span>
+                          <span className="flex-1">{course.courseStartDate || 'Not specified'}</span>
                         </li>
                         <li className="flex items-start">
                           <span className="font-medium min-w-[100px]">Location:</span>
-                          <span className="flex-1">{course.courseLocation}</span>
+                          <span className="flex-1">{course.courseLocation || 'Not specified'}</span>
                         </li>
                       </ul>
                     </div>
 
                     <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
                       <button
-                        onClick={() => deleteCourse(course.courseId)}
+                        onClick={() => course.courseId && deleteCourse(course.courseId)}
                         className="text-red-500 hover:text-red-700 dark:hover:text-red-400 flex items-center gap-1 px-3 py-1 rounded transition"
                       >
                         <Trash2 size={16} /> Delete

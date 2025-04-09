@@ -3,8 +3,9 @@ import joblkimg from "../../../Assets/joblk.png";
 import Banner from "../../../comon/Banner/Banner";
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
 import Swal from "sweetalert2";
-import { CircleUserRound, X, Download, FileText, Trash2, Check } from 'lucide-react';
+import { CircleUserRound, X, Download, FileText, Trash2, Check, ListChecks } from 'lucide-react';
 import TrainersHeader from "../../../Headers/TrainersHeader";
+import { useNavigate } from "react-router-dom";
 
 function TrainersApplicants() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,7 +18,7 @@ function TrainersApplicants() {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [applicantImages, setApplicantImages] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
-  const [showAccepted, setShowAccepted] = useState(false);
+  const navigate = useNavigate();
 
   const showSuccessMessage = (message) => {
     Swal.fire({
@@ -133,6 +134,10 @@ function TrainersApplicants() {
       showErrorMessage("Failed to download CV");
       return null;
     }
+  };
+
+  const navigateToAcceptedApplicants = () => {
+    navigate('/trainers/dashboard/applicants/details');
   };
 
   const acceptDocument = async (applicantId) => {
@@ -274,14 +279,6 @@ function TrainersApplicants() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  const toggleShowAccepted = () => {
-    setShowAccepted(prev => !prev);
-  };
-
-  const displayedApplicants = showAccepted 
-    ? filteredApplicants 
-    : filteredApplicants.filter(app => app.status !== 'ACCEPTED');
-
   useEffect(() => {
     return () => {
       Object.values(applicantImages).forEach(url => {
@@ -388,17 +385,13 @@ function TrainersApplicants() {
                   Course Applicants
                 </h1>
               </div>
-              
-              <div>
-                <button 
-                  onClick={toggleShowAccepted}
-                  className={`px-4 py-2 rounded-md transition-colors ${
-                    showAccepted 
-                      ? 'bg-blue-500 hover:bg-blue-600 text-white' 
-                      : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-                  }`}
+              <div className="flex gap-2">
+                <button
+                  onClick={navigateToAcceptedApplicants}
+                  className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded transition"
                 >
-                  {showAccepted ? 'Hide Accepted' : 'Show Accepted'}
+                  <ListChecks size={18} />
+                  View Accepted Applicants
                 </button>
               </div>
             </div>
@@ -407,13 +400,13 @@ function TrainersApplicants() {
               {loading && <div className="text-center py-8">Loading applicants...</div>}
               {error && <div className="text-center py-8 text-red-500">{error}</div>}
 
-              {!loading && displayedApplicants.length === 0 ? (
+              {!loading && filteredApplicants.length === 0 ? (
                 <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
-                  {showAccepted ? 'No course applicants available at the moment.' : 'No pending course applicants available.'}
+                  No course applicants available at the moment.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {displayedApplicants.map((applicant) => (
+                  {filteredApplicants.map((applicant) => (
                     <div key={applicant.id} className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
                       <div className="p-4 flex items-start">
                         <img 

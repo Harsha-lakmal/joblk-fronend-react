@@ -19,8 +19,9 @@ import AdminAboutPage from '../pages/AdminPage/AdminAboutPage/AdminAboutPage';
 import LoginPage from '../pages/LoginPage/LoginPage';
 import SignPage from '../pages/SignPage/SignPage'
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
-import ProfilePage from '../pages/SettingPage/SettingPage';
+
 import AcceptJobDocumentDetails from '../comon/AcceptJobDocumentDetails/AcceptJobDocumentDetails';
+import AcceptCourseDocumentDetails from '../comon/AcceptCourseDocumentDetails/AcceptCourseDocumentDetails ';
 
 function App() {
   const location = useLocation();
@@ -49,6 +50,8 @@ function App() {
       <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />  
       <Route path="/admin/dashboard/settings" element={<AdminAboutPage />} />    
       <Route path="/employees/dashboard/applicants/details" element={<AcceptJobDocumentDetails />} />
+      <Route path="/trainers/dashboard/applicants/details" element={<AcceptCourseDocumentDetails/>} />
+
 
 
   
