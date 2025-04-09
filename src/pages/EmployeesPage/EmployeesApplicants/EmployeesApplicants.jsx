@@ -3,8 +3,8 @@ import joblkimg from "../../../Assets/joblk.png";
 import Banner from "../../../comon/Banner/Banner";
 import { instance } from "../../../Service/AxiosHolder/AxiosHolder";
 import Swal from "sweetalert2";
-import { CircleUserRound, X, Download, FileText, Trash2, Check } from 'lucide-react';
-
+import { CircleUserRound, X, Download, FileText, Trash2, Check, ListChecks } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import EmployeesHeader from "../../../Headers/EmployeesHeader";
 
 function EmployeesApplicants() {
@@ -18,6 +18,7 @@ function EmployeesApplicants() {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [applicantImages, setApplicantImages] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
+  const navigate = useNavigate();
 
   const showSuccessMessage = (message) => {
     Swal.fire({
@@ -233,21 +234,6 @@ function EmployeesApplicants() {
   
       if (result.isConfirmed) {
         const applicantToAccept = applicants.find(applicant => applicant && applicant.id === applicantId);
-        console.log(applicantToAccept.id);
-        console.log(applicantToAccept.username);
-        console.log(applicantToAccept.qualifications);
-        console.log(applicantToAccept.age);
-        console.log(applicantToAccept.gender);
-        console.log(applicantToAccept.applyDate);
-        console.log(applicantToAccept.userEmail);
-        console.log(applicantToAccept.number);
-        console.log(applicantToAccept.address);
-        console.log(applicantToAccept.jobId);
-        console.log(applicantToAccept.userId);
-        console.log(applicantToAccept.jobTitle);
-
-
-        
         
         if (!applicantToAccept) {
           throw new Error('Applicant not found');
@@ -299,6 +285,10 @@ function EmployeesApplicants() {
       console.error('Error accepting document:', error);
       showErrorMessage("Failed to accept applicant");
     }
+  };
+
+  const navigateToAcceptedApplicants = () => {
+    navigate('/employees/dashboard/applicants/details');
   };
 
   return (
@@ -399,6 +389,15 @@ function EmployeesApplicants() {
                 <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold" style={{ color: "#6495ED" }}>
                   Job Applicants
                 </h1>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={navigateToAcceptedApplicants}
+                  className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded transition"
+                >
+                  <ListChecks size={18} />
+                  View Accepted Applicants
+                </button>
               </div>
             </div>
 
