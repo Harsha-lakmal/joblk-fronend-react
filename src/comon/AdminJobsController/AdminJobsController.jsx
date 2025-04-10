@@ -39,7 +39,6 @@ function AdminJobsController() {
         });
     }
 
-    // Function to refresh token
     const refreshToken = async () => {
         try {
             const refreshResponse = await instance.post('/auth/refresh', {
@@ -50,7 +49,6 @@ function AdminJobsController() {
             return newToken;
         } catch (error) {
             errorMessage("Session expired. Please login again.");
-            // Redirect to login page or handle as needed
             return null;
         }
     };
@@ -68,7 +66,7 @@ function AdminJobsController() {
                     'Authorization': `Bearer ${currentToken}`
                 }
             });
-            
+
             setJobs(response.data);
             const dateUpdates = {};
             response.data.forEach(job => {
@@ -137,7 +135,6 @@ function AdminJobsController() {
         setJobTitle(job.jobTitle);
         setJobDescription(job.jobDescription);
         setJobQualifications(job.qualifications);
-        // Ensure date is formatted correctly
         const dateValue = job.jobClosingDate ? job.jobClosingDate.split('T')[0] : '';
         setJobClosingDate(dateValue);
         setModalOpen(true);
@@ -160,7 +157,7 @@ function AdminJobsController() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            
+
             const updatedJobs = jobs.map(job =>
                 job.jobId === jobToUpdate.jobId ? { ...job, ...response.data } : job
             );
@@ -171,14 +168,13 @@ function AdminJobsController() {
             if (err.response && err.response.status === 403) {
                 const newToken = await refreshToken();
                 if (newToken) {
-                    // Try again with new token
                     try {
                         const response = await instance.put(`/job/updateJob`, updatedJob, {
                             headers: {
                                 'Authorization': `Bearer ${newToken}`
                             }
                         });
-                        
+
                         const updatedJobs = jobs.map(job =>
                             job.jobId === jobToUpdate.jobId ? { ...job, ...response.data } : job
                         );
@@ -255,45 +251,43 @@ function AdminJobsController() {
                 )}
 
                 {showPopup && selectedJob && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-semibold text-gray-800">Publisher Details</h3>
-                                <button
-                                    onClick={() => setShowPopup(false)}
-                                    className="text-gray-500 hover:text-gray-700 transition"
-                                >
-                                    <X size={24} />
-                                </button>
-                            </div>
+                    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">
+                        <div className="flex justify-between items-center mb-3">
+                            <h3 className="font-semibold text-lg">Publisher Details</h3>
+                            <button
+                                onClick={() => setShowPopup(false)}
+                                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
 
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <span className="font-medium text-gray-700 w-32">Name:</span>
-                                    <span className="text-gray-600">{userDetails?.username || 'N/A'}</span>
-                                </div>
-                                <div className="flex items-center">
-                                    <span className="font-medium text-gray-700 w-32">Role:</span>
-                                    <span className="text-gray-600">{userDetails?.role || 'N/A'}</span>
-                                </div>
-                                <div className="flex items-center">
-                                    <span className="font-medium text-gray-700 w-32">Email:</span>
-                                    <span className="text-gray-600 truncate">{userDetails?.email || 'N/A'}</span>
-                                </div>
-                                <div className="flex items-center">
-                                    <span className="font-medium text-gray-700 w-32">Upload Date:</span>
-                                    <span className="text-gray-600">{uploadDates[selectedJob.jobId] || 'N/A'}</span>
-                                </div>
+                        <div className="space-y-2 text-sm">
+                            <div className="flex items-center">
+                                <span className="font-medium w-20">Name:</span>
+                                <span>{userDetails?.username || 'N/A'}</span>
                             </div>
+                            <div className="flex items-center">
+                                <span className="font-medium w-20">Role:</span>
+                                <span>{userDetails?.role || 'N/A'}</span>
+                            </div>
+                            <div className="flex items-center">
+                                <span className="font-medium w-20">Email:</span>
+                                <span className="truncate">{userDetails?.email || 'N/A'}</span>
+                            </div>
+                            <div className="flex items-center">
+                                <span className="font-medium w-20">Upload Date:</span>
+                                <span className="truncate">{uploadDates[selectedJob.jobId] || 'N/A'}</span>
+                            </div>
+                        </div>
 
-                            <div className="mt-6 flex justify-end">
-                                <button
-                                    className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition"
-                                    onClick={() => setShowPopup(false)}
-                                >
-                                    Close
-                                </button>
-                            </div>
+                        <div className="mt-4 flex justify-end">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition"
+                                onClick={() => setShowPopup(false)}
+                            >
+                                Close
+                            </button>
                         </div>
                     </div>
                 )}
@@ -369,8 +363,8 @@ function AdminJobsController() {
             </div>
 
             {modalOpen && jobToUpdate && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
+                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-100">
+                    <div >
                         <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Update Job</h2>
                         <form onSubmit={handleSubmitUpdate}>
                             <div className="mb-4">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, FileCheck , BookOpen, Briefcase, X, Settings  } from 'lucide-react';
+import { Home, FileCheck , BookOpen, Briefcase, X, Settings , Users  } from 'lucide-react';
 import Notifications from '../components/DropdownNotifications';
 import Help from '../components/DropdownHelp';
 import UserMenu from '../components/DropdownProfile';
@@ -72,16 +72,16 @@ function AdminHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
 
           <nav className="hidden lg:flex flex-1 justify-center">
             <ul className="flex space-x-1">
-              <SidebarLinkGroup activecondition={location.pathname === "/employees/dashboard/home"}>
+              <SidebarLinkGroup activecondition={location.pathname === "/employees/dashboard/users"}>
                 <NavLink
                   end
-                  to="/admin/dashboard/home"
+                  to="/admin/dashboard/users"
                   className={({ isActive }) => 
                     `flex items-center px-4 py-2 rounded-lg transition-colors group ${isActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400'} cursor-pointer`
                   }
                 >
-                  <Home className={`w-5 h-5 mr-2 ${location.pathname === "/employees/dashboard/home" ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
-                  <span className="text-sm font-medium">Home</span>
+                  <Users  className={`w-5 h-5 mr-2 ${location.pathname === "/employees/dashboard/users " ? 'text-violet-500 dark:text-violet-400' : 'text-gray-500 group-hover:text-violet-500 dark:text-gray-400 dark:group-hover:text-violet-400'}`} />
+                  <span className="text-sm font-medium">Users </span>
                 </NavLink>
               </SidebarLinkGroup>
 
@@ -151,13 +151,13 @@ function AdminHeader({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 <li>
                   <NavLink
                     end
-                    to="/admin/dashboard/home"
+                    to="/admin/dashboard/users"
                     className={({ isActive }) => 
                       `flex items-center px-4 py-2 rounded-lg transition-colors ${isActive ? 'bg-violet-500/10 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} cursor-pointer`
                     }
                   >
-                    <Home className="w-5 h-5 mr-3" />
-                    <span className="text-sm font-medium">Home</span>
+                    <Users  className="w-5 h-5 mr-3" />
+                    <span className="text-sm font-medium">Users </span>
                   </NavLink>
                 </li>
                 

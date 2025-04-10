@@ -7,7 +7,6 @@ import { instance } from "/src/Service/AxiosHolder/AxiosHolder.jsx";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
-
 const SettingPage = () => {
   const [coverImage, setCoverImage] = useState("/default-cover.jpg");
   const [profileImage, setProfileImage] = useState("/default-profile.jpg");
@@ -22,6 +21,7 @@ const SettingPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("Employee");
   const [passwordError, setPasswordError] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   const fileInputRef = useRef(null);
@@ -41,7 +41,10 @@ const SettingPage = () => {
       setRole(parsedUser.role || "Employee");
     }
     
-  
+    const savedMode = localStorage.getItem("darkMode") === "true";
+    setDarkMode(savedMode);
+    document.documentElement.classList.toggle("dark", savedMode);
+    
     const savedNotifications = localStorage.getItem("notificationsEnabled") !== "false";
     setNotificationsEnabled(savedNotifications);
   }, [parsedUser]);
@@ -311,7 +314,14 @@ const SettingPage = () => {
     });
   };
 
- 
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem("darkMode", newMode.toString());
+    document.documentElement.classList.toggle("dark", newMode);
+    showSuccessMessage(newMode ? "Dark mode enabled" : "Light mode enabled");
+  };
+
   const handleDeleteAccount = () => {
     Swal.fire({
       title: "Delete your account?",
@@ -496,7 +506,41 @@ const SettingPage = () => {
           </button>
         </div>
 
-        
+        {/* Dark Mode Toggle Card */}
+        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 transition-all hover:shadow-2xl hover:-translate-y-1">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full">
+              {darkMode ? (
+                <Sun className="text-blue-600 dark:text-blue-400" size={24} />
+              ) : (
+                <Moon className="text-blue-600 dark:text-blue-400" size={24} />
+              )}
+            </div>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+              {darkMode ? "Light Mode" : "Dark Mode"}
+            </h2>
+          </div>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            Switch between light and dark theme
+          </p>
+          <button
+            onClick={toggleDarkMode}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-300"
+          >
+            {darkMode ? (
+              <>
+                <Sun size={20} />
+                Switch to Light
+              </>
+            ) : (
+              <>
+                <Moon size={20} />
+                Switch to Dark
+              </>
+            )}
+          </button>
+        </div>
+
         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 transition-all hover:shadow-2xl hover:-translate-y-1">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 bg-rose-100 dark:bg-rose-900/50 rounded-full">
@@ -524,7 +568,7 @@ const SettingPage = () => {
               <Users className="text-green-600 dark:text-green-400" size={24} />
             </div>
             <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-              Sports Team Help
+              Sports Team Help 
             </h2>
           </div>
           <p className="text-gray-600 dark:text-gray-300 mb-6">

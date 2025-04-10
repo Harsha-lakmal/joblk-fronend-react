@@ -45,16 +45,12 @@ function App() {
       <Route path="/trainers/dashboard/settings" element={<TrainersAbout />} />
       <Route path="/trainers/dashboard/course" element={<TrainersCourse />} />
       <Route path="/trainers/dashboard/applicants" element={<TrainersApplicants/>} />
-      <Route path="/admin/dashboard/home" element={<AdminUserPage />} />
+      <Route path="/admin/dashboard/users" element={<AdminUserPage />} />
       <Route path="/admin/dashboard/job" element={<AdminJobPage />} />
       <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />  
       <Route path="/admin/dashboard/settings" element={<AdminAboutPage />} />    
       <Route path="/employees/dashboard/applicants/details" element={<AcceptJobDocumentDetails />} />
       <Route path="/trainers/dashboard/applicants/details" element={<AcceptCourseDocumentDetails/>} />
-
-
-
-  
       <Route path="/error" element={<NotFoundPage />} />    
     </Routes>
    

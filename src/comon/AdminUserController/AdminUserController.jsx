@@ -10,7 +10,7 @@ function AdminUserController() {
     const [modalOpen, setModalOpen] = useState(false);
     const [userToUpdate, setUserToUpdate] = useState(null);
     const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [password, setPassword] = useState('update');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('');
     const token = localStorage.getItem('authToken');
@@ -116,7 +116,7 @@ function AdminUserController() {
         setUserToUpdate(user);
         setUsername(user.username);
         setEmail(user.email);
-        setPassword('');  
+        setPassword(user.password);  
         setRole(user.role);
         setModalOpen(true);
     };
@@ -260,8 +260,8 @@ function AdminUserController() {
             )}
 
             {modalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-100">
+                    <div >
                         <div className="p-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
@@ -311,7 +311,7 @@ function AdminUserController() {
                                             type="password" 
                                             id="password" 
                                             value={password} 
-                                            onChange={(e) => setPassword(e.target.value)} 
+                                            onChange={(e) => setPassword(e.target.value || "update")} 
                                             className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                             placeholder="Leave blank to keep current"
                                         />
@@ -331,6 +331,7 @@ function AdminUserController() {
                                     >
                                         <option value="Admin">Admin</option>
                                         <option value="Employee">Employee</option>
+                                        <option value="Employees">Employees</option>
                                         <option value="Trainer">Trainer</option>
                                     </select>
                                 </div>
