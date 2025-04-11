@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Banner from '../../../comon/Banner/Banner';
 import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
 import joblkimg from '../../../Assets/joblk.png';
-import Swal from 'sweetalert2';
 import { CircleUserRound, X } from 'lucide-react';
 import EmployeesHeader from '../../../Headers/EmployeesHeader';
 
 function EmployeesHome() {
   const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [jobsImages, setJobsImages] = useState({});
@@ -16,6 +16,7 @@ function EmployeesHome() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [uploadDates, setUploadDates] = useState({});
+  const [filterOption, setFilterOption] = useState('all'); // Default filter: all jobs
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
@@ -32,6 +33,49 @@ function EmployeesHome() {
 
     return () => clearInterval(interval);
   }, [token]);
+
+  // Apply filtering when jobs or filterOption changes
+  useEffect(() => {
+    filterJobs();
+  }, [jobs, filterOption]);
+
+  const filterJobs = () => {
+    const now = new Date();
+    
+    switch (filterOption) {
+      case 'expiring-24h':
+        // Jobs expiring within the next 24 hours
+        const oneDayLater = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        setFilteredJobs(jobs.filter(job => {
+          const closingDate = new Date(job.jobClosingDate);
+          return closingDate > now && closingDate <= oneDayLater;
+        }));
+        break;
+        
+      case 'expiring-3d':
+        // Jobs expiring within the next 3 days
+        const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+        setFilteredJobs(jobs.filter(job => {
+          const closingDate = new Date(job.jobClosingDate);
+          return closingDate > now && closingDate <= threeDaysLater;
+        }));
+        break;
+        
+      case 'expired':
+        // Jobs that have already expired
+        setFilteredJobs(jobs.filter(job => {
+          const closingDate = new Date(job.jobClosingDate);
+          return closingDate < now;
+        }));
+        break;
+        
+      case 'all':
+      default:
+        // All jobs
+        setFilteredJobs(jobs);
+        break;
+    }
+  };
 
   const getJobsData = () => {
     setLoading(true);
@@ -119,6 +163,10 @@ function EmployeesHome() {
     }
   };
 
+  const handleFilterChange = (option) => {
+    setFilterOption(option);
+  };
+
   useEffect(() => {
     return () => {
       Object.values(jobsImages).forEach(url => URL.revokeObjectURL(url));
@@ -176,18 +224,48 @@ function EmployeesHome() {
 
         <main className="grow">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6" style={{color :"#6495ED"}}  >Job Post</h1>
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-2xl font-bold" style={{color: "#6495ED"}}>Job Post</h1>
+              
+              {/* Filter options */}
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => handleFilterChange('expiring-24h')}
+                  className={`px-3 py-1 rounded text-sm transition ${filterOption === 'expiring-24h' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                >
+                  Expiring in 24h
+                </button>
+                <button 
+                  onClick={() => handleFilterChange('expiring-3d')}
+                  className={`px-3 py-1 rounded text-sm transition ${filterOption === 'expiring-3d' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                >
+                  Expiring in 3 days
+                </button>
+                <button 
+                  onClick={() => handleFilterChange('all')}
+                  className={`px-3 py-1 rounded text-sm transition ${filterOption === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                >
+                  All Posts
+                </button>
+                <button 
+                  onClick={() => handleFilterChange('expired')}
+                  className={`px-3 py-1 rounded text-sm transition ${filterOption === 'expired' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                >
+                  Expired Posts
+                </button>
+              </div>
+            </div>
 
             {error && <div className="text-center py-4 text-red-500">{error}</div>}
             {loading && <div className="text-center py-4">Loading...</div>}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {jobs.length === 0 && !loading ? (
+              {filteredJobs.length === 0 && !loading ? (
                 <div className="col-span-full text-center py-4 text-gray-500 dark:text-gray-400">
-                  No jobs available at the moment.
+                  No jobs available with the current filter.
                 </div>
               ) : (
-                jobs.map((job) => (
+                filteredJobs.map((job) => (
                   <div key={job.jobId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden flex flex-col hover:scale-[1.02] transition-transform duration-300 h-full">
                     <div className="relative h-48 w-full">
                       <img 
@@ -220,7 +298,7 @@ function EmployeesHome() {
                         </li>
                         <li className="flex">
                           <span className="font-medium min-w-[110px]">Closing Date:</span>
-                          <span className="text-gray-700 dark:text-gray-300">
+                          <span className={`text-gray-700 dark:text-gray-300 ${new Date(job.jobClosingDate) < new Date() ? 'text-red-500' : ''}`}>
                             {new Date(job.jobClosingDate).toLocaleDateString()}
                           </span>
                         </li>
@@ -232,6 +310,11 @@ function EmployeesHome() {
                     </div>
 
                     <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                      {new Date(job.jobClosingDate) < new Date() ? (
+                        <span className="text-red-500 font-medium text-sm">Expired</span>
+                      ) : (
+                        <span className="text-green-500 font-medium text-sm">Active</span>
+                      )}
                     </div>
                   </div>
                 ))

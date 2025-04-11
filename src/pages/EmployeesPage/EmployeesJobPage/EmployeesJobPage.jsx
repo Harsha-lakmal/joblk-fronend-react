@@ -15,7 +15,8 @@ function EmployeesJobPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
   const [selectedJob, setSelectedJob] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPublisherPopup, setShowPublisherPopup] = useState(false);
+  const [showJobDetailsPopup, setShowJobDetailsPopup] = useState(false);
   const [uploadDates, setUploadDates] = useState({});
   const [editingJob, setEditingJob] = useState(null);
   const token = localStorage.getItem('authToken');
@@ -116,7 +117,7 @@ function EmployeesJobPage() {
         })
           .then((response) => {
             showSuccessMessage("Job deleted successfully");
-            getData(); 
+            getData();
           })
           .catch((error) => {
             setLoading(false);
@@ -129,10 +130,12 @@ function EmployeesJobPage() {
 
   const startEditing = (job) => {
     setEditingJob({ ...job });
+    setShowJobDetailsPopup(true);
   };
 
   const cancelEditing = () => {
     setEditingJob(null);
+    setShowJobDetailsPopup(false);
   };
 
   const handleEditChange = (e) => {
@@ -153,7 +156,8 @@ function EmployeesJobPage() {
       .then((response) => {
         showSuccessMessage("Job updated successfully");
         setEditingJob(null);
-        getData(); 
+        setShowJobDetailsPopup(false);
+        getData();
       })
       .catch((error) => {
         setLoading(false);
@@ -228,7 +232,7 @@ function EmployeesJobPage() {
     const userData = await fetchUserDetails(job.userId);
     if (userData) {
       setUserDetails(userData);
-      setShowPopup(true);
+      setShowPublisherPopup(true);
     } else {
       console.error("Could not fetch user details");
     }
@@ -245,12 +249,12 @@ function EmployeesJobPage() {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <EmployeesHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        {showPopup && selectedJob && (
+        {showPublisherPopup && selectedJob && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 w-80">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-semibold text-lg">Publisher Details</h3>
-              <button
-                onClick={() => setShowPopup(false)}
+              <button 
+                onClick={() => setShowPublisherPopup(false)} 
                 className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               >
                 <X size={20} />
@@ -272,17 +276,100 @@ function EmployeesJobPage() {
               </div>
               <div className="flex items-center">
                 <span className="font-medium w-20">Upload Date:</span>
-                <span className="truncate">{uploadDates[selectedJob.jobId] || 'N/A'}</span>
+                <span className="truncate">
+                  {uploadDates[selectedJob.jobId] || 'N/A'}
+                </span>
               </div>
             </div>
 
             <div className="mt-4 flex justify-end">
               <button
                 className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition"
-                onClick={() => setShowPopup(false)}
+                onClick={() => setShowPublisherPopup(false)}
               >
                 Close
               </button>
+            </div>
+          </div>
+        )}
+
+        {showJobDetailsPopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+              className="absolute inset-0 bg-black bg-opacity-50"
+              onClick={cancelEditing}
+            ></div>
+            <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4 z-50">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold">
+                  {editingJob ? "Edit Job" : "Job Details"}
+                </h3>
+                <button
+                  onClick={cancelEditing}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Title</label>
+                  <input
+                    type="text"
+                    name="jobTitle"
+                    value={editingJob?.jobTitle || ''}
+                    onChange={handleEditChange}
+                    className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Description</label>
+                  <textarea
+                    name="jobDescription"
+                    value={editingJob?.jobDescription || ''}
+                    onChange={handleEditChange}
+                    className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                    rows="4"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Qualifications</label>
+                  <input
+                    type="text"
+                    name="qualifications"
+                    value={editingJob?.qualifications || ''}
+                    onChange={handleEditChange}
+                    className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Closing Date</label>
+                  <input
+                    type="date"
+                    name="jobClosingDate"
+                    value={editingJob?.jobClosingDate ? editingJob.jobClosingDate.split('T')[0] : ''}
+                    onChange={handleEditChange}
+                    className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end space-x-3">
+                <button
+                  onClick={cancelEditing}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={updateJob}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+                  disabled={loading}
+                >
+                  {loading ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -291,7 +378,7 @@ function EmployeesJobPage() {
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
             <div className="mb-8">
               <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold mb-4" style={{ color: "#6495ED" }}>
-              Your Post for View
+                Your Post for View
               </h1>
               <AddJob onJobAdded={getData} />
             </div>
@@ -327,109 +414,42 @@ function EmployeesJobPage() {
                       </button>
                     </div>
 
-                    {/* Job details */}
-                    <div className="p-5 flex-grow">
-                      {editingJob?.jobId === job.jobId ? (
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-sm font-medium mb-1">Title</label>
-                            <input
-                              type="text"
-                              name="jobTitle"
-                              value={editingJob.jobTitle}
-                              onChange={handleEditChange}
-                              className="w-full p-2 border rounded"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium mb-1">Description</label>
-                            <textarea
-                              name="jobDescription"
-                              value={editingJob.jobDescription}
-                              onChange={handleEditChange}
-                              className="w-full p-2 border rounded"
-                              rows="3"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium mb-1">Qualifications</label>
-                            <input
-                              type="text"
-                              name="qualifications"
-                              value={editingJob.qualifications}
-                              onChange={handleEditChange}
-                              className="w-full p-2 border rounded"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium mb-1">Closing Date</label>
-                            <input
-                              type="date"
-                              name="jobClosingDate"
-                              value={editingJob.jobClosingDate ? editingJob.jobClosingDate.split('T')[0] : ''}
-                              onChange={handleEditChange}
-                              className="w-full p-2 border rounded"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                            {job.jobDescription}
-                          </p>
+                    <div className="p-4 flex-grow">
+                      <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                        {job.jobDescription}
+                      </p>
 
-                          <ul className="space-y-2 text-sm">
-                            <li className="flex">
-                              <span className="font-medium min-w-[110px]">Qualifications:</span>
-                              <span className="text-gray-700 dark:text-gray-300">{job.qualifications}</span>
-                            </li>
-                            <li className="flex">
-                              <span className="font-medium min-w-[110px]">Closing Date:</span>
-                              <span className="text-gray-700 dark:text-gray-300">
-                                {new Date(job.jobClosingDate).toLocaleDateString()}
-                              </span>
-                            </li>
-                            <li className="flex">
-                              <span className="font-medium min-w-[110px]">Location:</span>
-                              <span className="text-gray-700 dark:text-gray-300">Panadura</span>
-                            </li>
-                          </ul>
-                        </>
-                      )}
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex">
+                          <span className="font-medium min-w-[110px]">Qualifications:</span>
+                          <span className="text-gray-700 dark:text-gray-300">{job.qualifications}</span>
+                        </li>
+                        <li className="flex">
+                          <span className="font-medium min-w-[110px]">Closing Date:</span>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {new Date(job.jobClosingDate).toLocaleDateString()}
+                          </span>
+                        </li>
+                        <li className="flex">
+                          <span className="font-medium min-w-[110px]">Location:</span>
+                          <span className="text-gray-700 dark:text-gray-300">Panadura</span>
+                        </li>
+                      </ul>
                     </div>
 
                     <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-                      {editingJob?.jobId === job.jobId ? (
-                        <>
-                          <button
-                            onClick={cancelEditing}
-                            className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 px-3 py-1 rounded transition"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={updateJob}
-                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition"
-                          >
-                            Save Changes
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => deleteJob(job.jobId)}
-                            className="text-red-500 hover:text-red-700 dark:hover:text-red-400 flex items-center gap-1 px-3 py-1 rounded transition"
-                          >
-                            <Trash2 size={16} /> Delete
-                          </button>
-                          <button
-                            onClick={() => startEditing(job)}
-                            className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 px-3 py-1 rounded transition"
-                          >
-                            <Edit size={16} /> Edit
-                          </button>
-                        </>
-                      )}
+                      <button
+                        onClick={() => deleteJob(job.jobId)}
+                        className="text-red-500 hover:text-red-700 dark:hover:text-red-400 flex items-center gap-1 px-3 py-1 rounded transition"
+                      >
+                        <Trash2 size={16} /> Delete
+                      </button>
+                      <button
+                        onClick={() => startEditing(job)}
+                        className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 px-3 py-1 rounded transition"
+                      >
+                        <Edit size={16} /> Edit
+                      </button>
                     </div>
                   </div>
                 ))

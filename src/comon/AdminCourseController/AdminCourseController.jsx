@@ -162,44 +162,6 @@ function AdminCourseController() {
         }
     };
 
-    const addCourse = async (e) => {
-        e.preventDefault();
-        setLoadingAction(true);
-
-        try {
-            const newCourse = {
-                courseTitle,
-                courseDescription,
-                courseLocation,
-                courseQualification,
-                courseContent,
-                courseStartDate
-            };
-
-            const response = await instance.post('/course/addCourse', newCourse, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            setCourses([...courses, response.data]);
-            setAddModalOpen(false);
-            resetForm();
-            showSuccess("Course added successfully");
-        } catch (error) {
-            console.error("Error adding course:", error);
-            showError("Failed to add course.");
-        } finally {
-            setLoadingAction(false);
-        }
-    };
-
-    const resetForm = () => {
-        setCourseTitle('');
-        setCourseDescription('');
-        setCourseLocation('');
-        setCourseQualification('');
-        setCourseContent('');
-        setCourseStartDate('');
-    };
 
     const prepareUpdateForm = (course) => {
         setCourseToUpdate(course);

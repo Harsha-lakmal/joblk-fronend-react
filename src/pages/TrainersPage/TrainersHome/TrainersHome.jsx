@@ -8,6 +8,7 @@ import TrainersHeader from '../../../Headers/TrainersHeader';
 
 function TrainersHome() {
   const [courses, setCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [courseImages, setCourseImages] = useState({});
@@ -16,6 +17,7 @@ function TrainersHome() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [courseUploadDates, setCourseUploadDates] = useState({});
+  const [filterOption, setFilterOption] = useState('all'); // Default filter: all courses
   const token = localStorage.getItem('authToken');
 
   const showSuccessMessage = () => {
@@ -52,6 +54,49 @@ function TrainersHome() {
 
     return () => clearInterval(interval);
   }, [token]);
+
+  // Apply filtering when courses or filterOption changes
+  useEffect(() => {
+    filterCourses();
+  }, [courses, filterOption]);
+
+  const filterCourses = () => {
+    const now = new Date();
+    
+    switch (filterOption) {
+      case 'starting-24h':
+        // Courses starting within the next 24 hours
+        const oneDayLater = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        setFilteredCourses(courses.filter(course => {
+          const startDate = new Date(course.courseStartDate);
+          return startDate > now && startDate <= oneDayLater;
+        }));
+        break;
+        
+      case 'starting-3d':
+        // Courses starting within the next 3 days
+        const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+        setFilteredCourses(courses.filter(course => {
+          const startDate = new Date(course.courseStartDate);
+          return startDate > now && startDate <= threeDaysLater;
+        }));
+        break;
+        
+      case 'started':
+        // Courses that have already started
+        setFilteredCourses(courses.filter(course => {
+          const startDate = new Date(course.courseStartDate);
+          return startDate < now;
+        }));
+        break;
+        
+      case 'all':
+      default:
+        // All courses
+        setFilteredCourses(courses);
+        break;
+    }
+  };
 
   const getCoursesData = async () => {
     try {
@@ -146,6 +191,10 @@ function TrainersHome() {
     }
   };
 
+  const handleFilterChange = (option) => {
+    setFilterOption(option);
+  };
+
   useEffect(() => {
     return () => {
       Object.values(courseImages).forEach(url => URL.revokeObjectURL(url));
@@ -206,16 +255,45 @@ function TrainersHome() {
             {error && <div className="text-center py-4 text-red-500">{error}</div>}
             {loading && <div className="text-center py-4">Loading...</div>}
 
-            <h1 className="text-2xl font-bold mb-6" style={{color :"#6495ED"}}  >Course Post</h1>
-
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-2xl font-bold" style={{color: "#6495ED"}}>Course Post</h1>
+              
+              {/* Filter options */}
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => handleFilterChange('starting-24h')}
+                  className={`px-3 py-1 rounded text-sm transition ${filterOption === 'starting-24h' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                >
+                  Starting in 24h
+                </button>
+                <button 
+                  onClick={() => handleFilterChange('starting-3d')}
+                  className={`px-3 py-1 rounded text-sm transition ${filterOption === 'starting-3d' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                >
+                  Starting in 3 days
+                </button>
+                <button 
+                  onClick={() => handleFilterChange('all')}
+                  className={`px-3 py-1 rounded text-sm transition ${filterOption === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                >
+                  All Courses
+                </button>
+                <button 
+                  onClick={() => handleFilterChange('started')}
+                  className={`px-3 py-1 rounded text-sm transition ${filterOption === 'started' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                >
+                  Started Courses
+                </button>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.length === 0 && !loading ? (
+              {filteredCourses.length === 0 && !loading ? (
                 <div className="col-span-full text-center py-4 text-gray-500 dark:text-gray-400">
-                  No courses available at the moment.
+                  No courses available with the current filter.
                 </div>
               ) : (
-                courses.map((course) => (
+                filteredCourses.map((course) => (
                   <div key={course.courseId} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden flex flex-col hover:scale-[1.02] transition-transform duration-300 h-full">
                     <div className="relative h-48 w-full">
                       <img 
@@ -252,7 +330,9 @@ function TrainersHome() {
                         </li>
                         <li className="flex items-start">
                           <span className="font-medium min-w-[100px]">Start Date:</span>
-                          <span className="flex-1">{course.courseStartDate}</span>
+                          <span className={`flex-1 ${new Date(course.courseStartDate) < new Date() ? 'text-red-500' : 'text-green-500'}`}>
+                            {new Date(course.courseStartDate).toLocaleDateString()}
+                          </span>
                         </li>
                         <li className="flex items-start">
                           <span className="font-medium min-w-[100px]">Location:</span>
@@ -262,6 +342,11 @@ function TrainersHome() {
                     </div>
 
                     <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                      {new Date(course.courseStartDate) < new Date() ? (
+                        <span className="text-red-500 font-medium text-sm">Already Started</span>
+                      ) : (
+                        <span className="text-green-500 font-medium text-sm">Upcoming</span>
+                      )}
                     </div>
                   </div>
                 ))
