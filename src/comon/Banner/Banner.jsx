@@ -1,86 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
+
 
 const Banner = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
-
-  const botResponses = [
-    {
-      keywords: ['hello'],
-      responses: ["Hello there! ,What help do you need from me?"],
-    },
-
-    {
-      keywords: [ 'hi'],
-      responses: ["Hi! How can I help you?"],
-    },
-    {
-      keywords: [ 'hey'],
-      responses: [ "Hey! What's up?"],
-    },
-    {
-      keywords: ['hello', 'hi', 'hey'],
-      responses: ["Hello there!", "Hi! How can I help you?", "Hey! What's up?"],
-    },
-    {
-      keywords: ['Job Details'],
-      responses: ["You can find out about our job opportunities through our posts. If you have any questions, you can contact us."],
-    },
-    {
-      keywords: ['course Details'],
-      responses: ["You can find out about our course opportunities through our posts. If you have any questions, you can contact us."],
-    },
-
-    {
-      keywords: ['how are you'] , 
-      responses: ["I'm doing well, thank you!"],
-    },
-    {
-      keywords: [ "how's it going"],
-      responses: [ "I'm just a bot, but I'm functioning perfectly!"],
-    },
-    {
-      keywords: ['thanks', 'thank you'],
-      responses: ["You're welcome!", "Happy to help!", "No problem at all!"],
-    },
-    
-    {
-      keywords: ['thanks'],
-      responses: ["You're welcome!"],
-    },
-    {
-      keywords: ['Good morning'],
-      responses: ["Good morning . Welcome to Joblk Sport Team "],
-    },
-    {
-      keywords: ['Good evining  '],
-      responses: ["Good eviing , Welcome to joblk Sport team "],
-    },
-    {
-      keywords: [ 'thank you'],
-      responses: [ "Happy to help!"],
-    },
-    {
-      keywords: ['bye', 'goodbye'],
-      responses: ["Goodbye! Come back anytime!", "See you later!", "Bye! Have a great day!"],
-    },
-    {
-      keywords: ['default'],
-      responses: [
-        "I don't understand what you're saying. What do you need my help with?",
-      ],
-    },
-  ];
 
   useEffect(() => {
     if (isChatOpen && messages.length === 0) {
       setTimeout(() => {
-        addBotMessage(getRandomResponse(['Hi there!', 'Hello! How can I help?', 'Welcome!']));
+        addBotMessage("Hello! How can I help you today?");
       }, 500);
-
     }
   }, [isChatOpen]);
 
@@ -96,37 +31,41 @@ const Banner = () => {
     setMessages(prev => [...prev, { id: Date.now(), text, isUser: false }]);
   };
 
-  const getRandomResponse = (responses) => {
-    return responses[Math.floor(Math.random() * responses.length)];
-  };
-
-  const findBotResponse = (userMessage) => {
-    const lowerCaseMessage = userMessage.toLowerCase();
-    
-    for (const responseSet of botResponses) {
-      if (responseSet.keywords.some(keyword => 
-        responseSet.keywords[0] === 'default' ? false : lowerCaseMessage.includes(keyword))
-      ) {
-        return getRandomResponse(responseSet.responses);
-      }
-    }
-    
-    const defaultSet = botResponses.find(set => set.keywords[0] === 'default');
-    return getRandomResponse(defaultSet.responses);
-  };
-
-  const handleSend = () => {
+  const handleSend = async () => {
     if (inputMessage.trim() === '') return;
 
     const newMessage = { id: Date.now(), text: inputMessage, isUser: true };
     setMessages(prev => [...prev, newMessage]);
     setInputMessage('');
     setShowCancel(true);
+    setIsLoading(true);
     
-    setTimeout(() => {
-      const botResponse = findBotResponse(inputMessage);
-      addBotMessage(botResponse);
-    }, 800);
+    try {
+      const token = localStorage.getItem('authToken');
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+      
+      const response = await instance.post("/chatbot/message",
+        { message: inputMessage },
+        config
+      );
+      console.log(response.data);
+      
+
+      if (response.data) {
+        addBotMessage(response.data);
+      } else {
+        addBotMessage("I'm sorry, I didn't get that. Could you please rephrase?");
+      }
+    } catch (error) {
+      console.error("Error contacting chatbot:", error);
+      addBotMessage("I'm having trouble connecting to the server. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const toggleChat = () => {
@@ -140,15 +79,13 @@ const Banner = () => {
     setMessages([]);
     setShowCancel(false);
     setTimeout(() => {
-      addBotMessage(getRandomResponse(["What would you like to talk about?", "How can I help you today?", "What's on your mind?"]));
+      addBotMessage("What would you like to talk about?");
     }, 500);
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isLoading) {
       handleSend();
-      console.log("input message : "+inputMessage);
-      
     }
   };
 
@@ -175,7 +112,6 @@ const Banner = () => {
           }} 
           onClick={toggleChat}
         >
-   
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
             width="40" 
@@ -215,7 +151,6 @@ const Banner = () => {
               display: 'flex',
               alignItems: 'center'
             }}>
-          
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 width="24" 
@@ -234,29 +169,31 @@ const Banner = () => {
                 color: '#fff',
                 fontSize: '20px',
                 fontWeight: 'bold',
-              }} >Joblk </span>
+              }}>Joblk</span>
             </div>
             <div style={{
               display: 'flex',
               alignItems: 'center',
             }}>
-              <button 
-                onClick={handleCancel} 
-                style={{
-                  marginRight: '15px',
-                  backgroundColor: '#e74c3c',
-                  padding: '6px 12px',
-                  borderRadius: '15px',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <span style={{
-                  color: '#fff',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                }}>Clean</span>
-              </button>
+              {showCancel && (
+                <button 
+                  onClick={handleCancel} 
+                  style={{
+                    marginRight: '15px',
+                    backgroundColor: '#e74c3c',
+                    padding: '6px 12px',
+                    borderRadius: '15px',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span style={{
+                    color: '#fff',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                  }}>Clean</span>
+                </button>
+              )}
               <button 
                 onClick={toggleChat} 
                 style={{
@@ -310,6 +247,21 @@ const Banner = () => {
                 </span>
               </div>
             ))}
+            {isLoading && (
+              <div style={{
+                maxWidth: '80%',
+                padding: '12px',
+                borderRadius: '15px',
+                marginBottom: '12px',
+                backgroundColor: '#f0f0f0',
+                alignSelf: 'flex-start',
+                borderBottomLeftRadius: '5px',
+                float: 'left',
+                clear: 'both',
+              }}>
+                <span style={{ color: '#333', fontSize: '16px' }}>Typing...</span>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
@@ -333,14 +285,15 @@ const Banner = () => {
                 outline: 'none',
               }}
               value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value.toLowerCase())}
+              onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Type a message..."
               onKeyPress={handleKeyPress}
+              disabled={isLoading}
             />
             <button 
               style={{
                 marginLeft: '12px',
-                backgroundColor: '#3498db',
+                backgroundColor: isLoading ? '#95a5a6' : '#3498db',
                 width: '45px',
                 height: '45px',
                 borderRadius: '23px',
@@ -349,9 +302,10 @@ const Banner = () => {
                 alignItems: 'center',
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                 border: 'none',
-                cursor: 'pointer',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
               }} 
               onClick={handleSend}
+              disabled={isLoading}
             >
               <span style={{
                 fontSize: '22px',
