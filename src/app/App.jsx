@@ -22,7 +22,6 @@ import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
 
 import AcceptJobDocumentDetails from '../comon/AcceptJobDocumentDetails/AcceptJobDocumentDetails';
 import AcceptCourseDocumentDetails from '../comon/AcceptCourseDocumentDetails/AcceptCourseDocumentDetails ';
-import Banner from '../comon/Banner/Banner';
 
 function App() {
   const location = useLocation();
@@ -34,30 +33,27 @@ function App() {
   }, [location.pathname]);
 
   return (
-    // <Routes>
-    //   <Route path="/*" element={<LoginPage />} />
-    //   <Route path="/signup" element={<LoginPage />} /> 
-    //   <Route path="/sign" element={<SignPage />} />
-    //   <Route path="/employees/dashboard/home" element={<EmployeesHome />} />
-    //   <Route path="/employees/dashboard/settings" element={<EmployeesAbout />} />
-    //   <Route path="/employees/dashboard/applicants" element={<EmployeesApplicants />} />
-    //   <Route path="/employees/dashboard/job" element={<EmployeesJobPage />} />
-    //   <Route path="/trainers/dashboard/home" element={<TrainersHome />} />
-    //   <Route path="/trainers/dashboard/settings" element={<TrainersAbout />} />
-    //   <Route path="/trainers/dashboard/course" element={<TrainersCourse />} />
-    //   <Route path="/trainers/dashboard/applicants" element={<TrainersApplicants/>} />
-    //   <Route path="/admin/dashboard/users" element={<AdminUserPage />} />
-    //   <Route path="/admin/dashboard/job" element={<AdminJobPage />} />
-    //   <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />  
-    //   <Route path="/admin/dashboard/settings" element={<AdminAboutPage />} />    
-    //   <Route path="/employees/dashboard/applicants/details" element={<AcceptJobDocumentDetails />} />
-    //   <Route path="/trainers/dashboard/applicants/details" element={<AcceptCourseDocumentDetails/>} />
-    //   <Route path="/error" element={<NotFoundPage />} />    
-    // </Routes>
-    <div>
-      <Banner/>
-    </div>
-   
+    <Routes>
+      <Route path="/*" element={<LoginPage />} />
+      <Route path="/signup" element={<LoginPage />} /> 
+      <Route path="/sign" element={<SignPage />} />
+      <Route path="/employees/dashboard/home" element={<EmployeesHome />} />
+      <Route path="/employees/dashboard/settings" element={<EmployeesAbout />} />
+      <Route path="/employees/dashboard/applicants" element={<EmployeesApplicants />} />
+      <Route path="/employees/dashboard/job" element={<EmployeesJobPage />} />
+      <Route path="/trainers/dashboard/home" element={<TrainersHome />} />
+      <Route path="/trainers/dashboard/settings" element={<TrainersAbout />} />
+      <Route path="/trainers/dashboard/course" element={<TrainersCourse />} />
+      <Route path="/trainers/dashboard/applicants" element={<TrainersApplicants/>} />
+      <Route path="/admin/dashboard/users" element={<AdminUserPage />} />
+      <Route path="/admin/dashboard/job" element={<AdminJobPage />} />
+      <Route path="/admin/dashboard/course" element={<AdminCoursePage />} />  
+      <Route path="/admin/dashboard/settings" element={<AdminAboutPage />} />    
+      <Route path="/employees/dashboard/applicants/details" element={<AcceptJobDocumentDetails />} />
+      <Route path="/trainers/dashboard/applicants/details" element={<AcceptCourseDocumentDetails/>} />
+      <Route path="/error" element={<NotFoundPage />} />    
+    </Routes>
+  
 
   );
 }
