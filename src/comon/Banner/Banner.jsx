@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { instance } from '/src/Service/AxiosHolder/AxiosHolder.jsx';
-
 
 const Banner = () => {
   const [messages, setMessages] = useState([]);
@@ -48,7 +46,8 @@ const Banner = () => {
         }
       };
       
-      const response = await instance.post("/chatbot/message",
+      const response = await axios.post(
+       "http://localhost:8080/api/v1/chatbot/message",
         { message: inputMessage },
         config
       );
