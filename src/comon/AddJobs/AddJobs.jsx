@@ -14,18 +14,12 @@ function AddJobs() {
   const [imgPath, SetImgPath] = useState(null);
 
 
-
-
-
-    
-
   const token = localStorage.getItem('authToken');
   const userData = JSON.parse(localStorage.getItem("userData"));
   const userId = userData?.id;
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
 
 
 
